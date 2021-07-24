@@ -7,9 +7,13 @@
   "scripts": {
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json"
+    "lint": "tslint -p tsconfig.json",
+    "start": "tsc && node lib/index.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0"
+  },
   "devDependencies": {
     "@types/node": "^16.4.1",
     "cz-conventional-changelog": "3.3.0",
