@@ -1,4 +1,4 @@
-import { Property } from '../notion/types';
+import { PageResponse, Property } from '../notion/types';
 declare class Database {
     #private;
     constructor(id: string, title: string, properties: Property[]);
@@ -6,10 +6,6 @@ declare class Database {
     get title(): string;
     get properties(): Property[];
     static get(databaseId: string): Promise<Database | null>;
-    validatePropertiesExist(propertyNames: string[]): {
-        valid: boolean;
-        errors: string[];
-    };
-    propertyExists(name: string): boolean;
+    createPage(data: Record<string, any>): Promise<PageResponse | undefined>;
 }
 export default Database;
