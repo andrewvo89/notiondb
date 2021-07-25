@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 import NotionUrl from './models/notion/notion-url';
 import NotionId from './models/notion/notion-id';
 import { getIdFromId, getIdFromUrl } from './utils/notion';
+import { Date, Email, PhoneNumber } from './models/property-data';
+import dayjs from 'dayjs';
 
 class NotionDB {
   constructor(integrationToken: string) {
@@ -59,7 +61,7 @@ class NotionDB {
         const error = e as AxiosError;
         if (error.isAxiosError && error.response?.status === 404) {
           await new Promise((resolve) =>
-            global.setTimeout(() => {
+            globalThis.setTimeout(() => {
               resolve(null);
             }, BACK_OFF_TIME),
           );
@@ -97,7 +99,7 @@ class NotionDB {
         const error = e as AxiosError;
         if (error.isAxiosError && error.response?.status === 404) {
           await new Promise((resolve) =>
-            global.setTimeout(() => {
+            globalThis.setTimeout(() => {
               resolve(null);
             }, BACK_OFF_TIME),
           );

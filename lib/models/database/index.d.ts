@@ -5,7 +5,7 @@ declare class Database {
     get id(): string;
     get title(): string;
     get properties(): Property[];
-    static get(databaseId: string): Promise<Database | null>;
+    getAllPages(): Promise<Record<string, any>[]>;
     createPage(data: Record<string, any>): Promise<PageResponse | undefined>;
 }
 export default Database;

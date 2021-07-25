@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "dayjs": "^1.10.6",
     "dotenv": "^10.0.0",
     "uuid": "^8.3.2"
   },
