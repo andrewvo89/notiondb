@@ -1,6 +1,10 @@
 import { AxiosError } from 'axios';
 import axios, { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
-import { PageResponse, Property } from '../notion/types';
+import {
+  PageResponse,
+  NotionProperty,
+  NotionPropertyData,
+} from '../notion/types';
 import {
   Checkbox,
   Date,
@@ -14,14 +18,13 @@ import {
   URL,
 } from '../property-data';
 import { PropertyData } from '../property-data/types';
-import { DatabaseResponse } from './types';
 
 class Database {
   #id: string;
   #title: string;
-  #properties: Property[];
+  #properties: NotionProperty[];
 
-  constructor(id: string, title: string, properties: Property[]) {
+  constructor(id: string, title: string, properties: NotionProperty[]) {
     this.#id = id;
     this.#title = title;
     this.#properties = properties;
@@ -39,40 +42,11 @@ class Database {
     return this.#properties;
   }
 
-  async getAllPages(): Promise<Record<string, any>[]> {
-    let hasMore: boolean = false;
-    let nextCursor: string = '';
-    const pages: Record<string, any>[] = [];
-    do {
-      let retries = 0;
-      try {
-        const response = await axios.post(`/databases/${this.#id}/query`);
-        pages.push(
-          ...response.data.results.map(
-            (result: Record<string, any>) => result.properties.Receipts.files,
-          ),
-        );
-        hasMore = response.data['has_more'];
-        if (hasMore) {
-          nextCursor = response.data['next_cursor'];
-        }
-      } catch (e) {
-        console.error(e);
-        const error = e as AxiosError;
-        if (error.isAxiosError && error.response?.status === 404) {
-          await new Promise((resolve) =>
-            globalThis.setTimeout(() => {
-              resolve(null);
-            }, BACK_OFF_TIME),
-          );
-        }
-        if (retries === MAX_RETRIES) {
-          continue;
-        }
-        retries++;
-      }
-    } while (hasMore);
-    return pages;
+  get pages() {
+    return {
+      getAll: (excludeProperties?: string[]) =>
+        getAllPages(this.#id, excludeProperties),
+    };
   }
 
   async createPage(
@@ -88,7 +62,6 @@ class Database {
         throw new Error(errors.join(', '));
       }
       const properties = transformToNotionProperties(this.#properties, data);
-      console.log('properties', properties);
       const response = await axios.post(`/pages`, {
         parent: {
           type: 'database_id',
@@ -108,7 +81,7 @@ export default Database;
 
 function validatePropertiesExist(
   propertyNames: string[],
-  properties: Property[],
+  properties: NotionProperty[],
 ): {
   valid: boolean;
   errors: string[];
@@ -128,8 +101,44 @@ function validatePropertiesExist(
   };
 }
 
+function transformFromNotionProperties(propertyData: NotionPropertyData): any {
+  const data = propertyData[propertyData.type];
+  switch (propertyData.type) {
+    case 'title':
+      return Title.getValue({ title: data });
+    case 'rich_text':
+      return RichText.getValue({ rich_text: data });
+    case 'number':
+      return Number.getValue({ number: data });
+    case 'select':
+      return Select.getValue({ select: data });
+    case 'multi_select':
+      return MultiSelect.getValue({ multi_select: data });
+    case 'date':
+      return Date.getValue({ date: data });
+    case 'checkbox':
+      return Checkbox.getValue({ checkbox: data });
+    case 'url':
+      return URL.getValue({ url: data });
+    case 'email':
+      return Email.getValue({ email: data });
+    case 'phone_number':
+      return PhoneNumber.getValue({ phone_number: data });
+    case 'formula': {
+      const type = propertyData.formula.type;
+      return transformFromNotionProperties({
+        id: propertyData.id,
+        type: type,
+        [type]: propertyData.formula[type],
+      });
+    }
+    default:
+      return undefined;
+  }
+}
+
 function transformToNotionProperties(
-  properties: Property[],
+  properties: NotionProperty[],
   data: Record<string, any>,
 ): Record<string, any> {
   return Object.entries(data).reduce(
@@ -176,9 +185,65 @@ function transformToNotionProperties(
       }
       return {
         ...notionProperties,
-        [propertyName]: propertyData.notionProperty,
+        [propertyName]: propertyData.notionValue,
       };
     },
     {},
   );
+}
+
+async function getAllPages(
+  databaseId: string,
+  excludeProperties?: string[],
+): Promise<Record<string, any>[]> {
+  let hasMore: boolean = false;
+  let nextCursor: string = '';
+  const pages: Record<string, any>[] = [];
+  do {
+    let retries = 0;
+    try {
+      const nextCursorParam: string = hasMore
+        ? `?start_cursor=${nextCursor}`
+        : '';
+      const response = await axios.post(
+        `/databases/${databaseId}/query${nextCursorParam}`,
+      );
+      const results = response.data.results as PageResponse[];
+      pages.push(
+        ...results.map((result: PageResponse) =>
+          Object.entries(result.properties).reduce(
+            (properties, [propertyName, value]) => {
+              if (excludeProperties?.includes(propertyName)) {
+                return properties;
+              }
+              return {
+                ...properties,
+                [propertyName]: transformFromNotionProperties(value),
+              };
+            },
+            {},
+          ),
+        ),
+      );
+      hasMore = response.data['has_more'];
+      if (hasMore) {
+        nextCursor = response.data['next_cursor'];
+      }
+    } catch (e) {
+      console.error(e);
+      const error = e as AxiosError;
+      if (error.isAxiosError && error.response?.status === 404) {
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
+      }
+      if (retries === MAX_RETRIES) {
+        continue;
+      }
+      retries++;
+    }
+  } while (hasMore);
+  return pages;
 }

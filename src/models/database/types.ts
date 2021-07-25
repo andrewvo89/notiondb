@@ -1,14 +1,16 @@
-import { Property, RichTextObject } from './../notion/types';
+import { NotionProperty, RichTextObject } from './../notion/types';
 
-export interface DatabaseResponse {
+interface DatabaseResponse {
   object: 'database';
   id: string;
   created_time: string;
   last_edited_time: string;
   title: RichTextObject;
-  properties: Record<string, Property>;
+  properties: Record<string, NotionProperty>;
   parent: {
     type: string;
     page_id: string;
   };
 }
+
+export { DatabaseResponse };

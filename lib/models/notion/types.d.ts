@@ -12,10 +12,15 @@ export interface RichTextObject {
     annotations: Annotations;
     type: 'text' | 'mention' | 'equation';
 }
-export interface Property {
+export interface NotionProperty {
     id: string;
     type: PropertyType;
     name: string;
+    [key: string]: any;
+}
+export interface NotionPropertyData {
+    id: string;
+    type: PropertyType;
     [key: string]: any;
 }
 export declare type PropertyType = 'title' | 'rich_text' | 'number' | 'select' | 'multi_select' | 'date' | 'people' | 'files' | 'checkbox' | 'url' | 'email' | 'phone_number' | 'formula' | 'relation' | 'rollup' | 'created_time' | 'created_by' | 'last_edited_time' | 'last_edited_by';
@@ -29,6 +34,6 @@ export interface PageResponse {
         database_id: string;
     };
     archived: boolean;
-    properties: Record<string, any>;
+    properties: Record<string, NotionPropertyData>;
     url: string;
 }

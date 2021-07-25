@@ -1,5 +1,18 @@
 import dayjs from 'dayjs';
-import { DateOptions, PropertyData } from './types';
+import {
+  CheckboxNotionValue,
+  DateNotionValue,
+  DateOptions,
+  EmailNotionValue,
+  MultiSelectNotionValue,
+  NumberNotionValue,
+  PhoneNumberNotionValue,
+  PropertyData,
+  RichTextNotionValue,
+  SelectNotionValue,
+  TitleNotionValue,
+  URLNotionValue,
+} from './types';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
@@ -11,7 +24,7 @@ class Title implements PropertyData {
     this.#value = value;
   }
 
-  get notionProperty() {
+  get notionValue(): TitleNotionValue {
     return {
       title: [
         {
@@ -23,6 +36,13 @@ class Title implements PropertyData {
       ],
     };
   }
+
+  static getValue(notionValue: TitleNotionValue) {
+    if (notionValue.title.length === 0) {
+      return '';
+    }
+    return notionValue.title[0].text.content;
+  }
 }
 
 class RichText implements PropertyData {
@@ -31,7 +51,7 @@ class RichText implements PropertyData {
     this.#value = value;
   }
 
-  get notionProperty() {
+  get notionValue(): RichTextNotionValue {
     return {
       rich_text: [
         {
@@ -43,6 +63,13 @@ class RichText implements PropertyData {
       ],
     };
   }
+
+  static getValue(notionValue: RichTextNotionValue) {
+    if (notionValue.rich_text.length === 0) {
+      return '';
+    }
+    return notionValue.rich_text[0].text.content;
+  }
 }
 
 class Number implements PropertyData {
@@ -51,10 +78,14 @@ class Number implements PropertyData {
     this.#value = value;
   }
 
-  get notionProperty() {
+  get notionValue(): NumberNotionValue {
     return {
       number: this.#value,
     };
+  }
+
+  static getValue(notionValue: NumberNotionValue) {
+    return notionValue.number;
   }
 }
 
@@ -64,12 +95,16 @@ class Select implements PropertyData {
     this.#value = value;
   }
 
-  get notionProperty() {
+  get notionValue(): SelectNotionValue {
     return {
       select: {
         name: this.#value,
       },
     };
+  }
+
+  static getValue(notionValue: SelectNotionValue) {
+    return notionValue.select;
   }
 }
 
@@ -80,10 +115,14 @@ class MultiSelect implements PropertyData {
     this.#values = values;
   }
 
-  get notionProperty() {
+  get notionValue(): MultiSelectNotionValue {
     return {
-      multi_select: this.#values.map((value: string) => ({ name: value })),
+      multi_select: this.#values.map((value) => ({ name: value })),
     };
+  }
+
+  static getValue(notionValue: MultiSelectNotionValue) {
+    return notionValue.multi_select.map((value) => value.name);
   }
 }
 
@@ -96,7 +135,7 @@ class Date implements PropertyData {
     this.#options = options;
   }
 
-  get notionProperty() {
+  get notionValue(): DateNotionValue {
     let dateProperties: Record<string, any> = {
       start: dayjs(this.#start).format('YYYY-MM-DD'),
     };
@@ -129,7 +168,20 @@ class Date implements PropertyData {
     }
     return {
       date: dateProperties,
+    } as DateNotionValue;
+  }
+
+  static getValue(notionValue: DateNotionValue) {
+    const value: {
+      start: globalThis.Date;
+      end?: globalThis.Date;
+    } = {
+      start: new globalThis.Date(notionValue.date.start),
     };
+    if (notionValue.date.end) {
+      value.end = new globalThis.Date(notionValue.date.end);
+    }
+    return value;
   }
 }
 
@@ -140,10 +192,14 @@ class Checkbox implements PropertyData {
     this.#value = value;
   }
 
-  get notionProperty() {
+  get notionValue(): CheckboxNotionValue {
     return {
       checkbox: this.#value,
     };
+  }
+
+  static getValue(notionValue: CheckboxNotionValue) {
+    return notionValue.checkbox;
   }
 }
 
@@ -154,10 +210,14 @@ class URL implements PropertyData {
     this.#value = value;
   }
 
-  get notionProperty() {
+  get notionValue(): URLNotionValue {
     return {
       url: this.#value,
     };
+  }
+
+  static getValue(notionValue: URLNotionValue) {
+    return notionValue.url;
   }
 }
 
@@ -168,10 +228,14 @@ class Email implements PropertyData {
     this.#value = value;
   }
 
-  get notionProperty() {
+  get notionValue(): EmailNotionValue {
     return {
       email: this.#value,
     };
+  }
+
+  static getValue(notionValue: EmailNotionValue) {
+    return notionValue.email;
   }
 }
 
@@ -182,10 +246,14 @@ class PhoneNumber implements PropertyData {
     this.#value = value;
   }
 
-  get notionProperty() {
+  get notionValue(): PhoneNumberNotionValue {
     return {
       phone_number: this.#value,
     };
+  }
+
+  static getValue(notionValue: PhoneNumberNotionValue) {
+    return notionValue.phone_number;
   }
 }
 

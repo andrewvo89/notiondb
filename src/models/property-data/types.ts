@@ -1,5 +1,5 @@
 interface PropertyData {
-  notionProperty: Record<string, any>;
+  notionValue: Record<string, any>;
 }
 
 interface DateOptions {
@@ -358,4 +358,74 @@ type Timezones =
   | 'Pacific/Apia'
   | 'Africa/Johannesburg';
 
-export { PropertyData, DateOptions };
+interface TitleNotionValue {
+  title: {
+    type: 'text';
+    text: {
+      content: string;
+    };
+  }[];
+}
+
+interface RichTextNotionValue {
+  rich_text: {
+    type: 'text';
+    text: {
+      content: string;
+    };
+  }[];
+}
+
+interface NumberNotionValue {
+  number: number;
+}
+
+interface SelectNotionValue {
+  select: {
+    name: string;
+  };
+}
+
+interface MultiSelectNotionValue {
+  multi_select: {
+    name: string;
+  }[];
+}
+
+interface DateNotionValue {
+  date: {
+    start: string;
+    end?: string;
+  };
+}
+
+interface CheckboxNotionValue {
+  checkbox: boolean;
+}
+
+interface URLNotionValue {
+  url: string;
+}
+
+interface EmailNotionValue {
+  email: string;
+}
+
+interface PhoneNumberNotionValue {
+  phone_number: string;
+}
+
+export {
+  PropertyData,
+  DateOptions,
+  TitleNotionValue,
+  RichTextNotionValue,
+  NumberNotionValue,
+  SelectNotionValue,
+  MultiSelectNotionValue,
+  DateNotionValue,
+  CheckboxNotionValue,
+  URLNotionValue,
+  EmailNotionValue,
+  PhoneNumberNotionValue,
+};

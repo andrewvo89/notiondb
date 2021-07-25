@@ -33,10 +33,16 @@ export interface RichTextObject {
   type: 'text' | 'mention' | 'equation';
 }
 
-export interface Property {
+export interface NotionProperty {
   id: string;
   type: PropertyType;
   name: string;
+  [key: string]: any;
+}
+
+export interface NotionPropertyData {
+  id: string;
+  type: PropertyType;
   [key: string]: any;
 }
 
@@ -71,6 +77,6 @@ export interface PageResponse {
     database_id: string;
   };
   archived: boolean;
-  properties: Record<string, any>;
+  properties: Record<string, NotionPropertyData>;
   url: string;
 }

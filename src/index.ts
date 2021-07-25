@@ -1,14 +1,12 @@
 import Database from './models/database';
 import { DatabaseResponse } from './models/database/types';
 import axios, { BACK_OFF_TIME, MAX_RETRIES } from './utils/api';
-import { Property } from './models/notion/types';
+import { NotionProperty } from './models/notion/types';
 import { AxiosError } from 'axios';
 import dotenv from 'dotenv';
 import NotionUrl from './models/notion/notion-url';
 import NotionId from './models/notion/notion-id';
 import { getIdFromId, getIdFromUrl } from './utils/notion';
-import { Date, Email, PhoneNumber } from './models/property-data';
-import dayjs from 'dayjs';
 
 class NotionDB {
   constructor(integrationToken: string) {
@@ -37,7 +35,7 @@ class NotionDB {
                 name: property.name,
                 type: property.type,
                 value: property[property.type],
-              } as Property),
+              } as NotionProperty),
           );
           const database = new Database(
             result.id,
@@ -71,7 +69,7 @@ class NotionDB {
     return databases;
   }
 
-  async getDatabase(identifer: NotionUrl | NotionId): Promise<Database> {
+  async getDatabaseRef(identifer: NotionUrl | NotionId): Promise<Database> {
     let databaseId: string = '';
     if (identifer instanceof NotionUrl) {
       databaseId = getIdFromUrl(identifer);
@@ -91,7 +89,7 @@ class NotionDB {
               name: property.name,
               type: property.type,
               value: property[property.type],
-            } as Property),
+            } as NotionProperty),
         );
         database = new Database(result.id, result.title.plain_text, properties);
       } catch (e) {
@@ -118,3 +116,15 @@ class NotionDB {
 }
 
 export default NotionDB;
+
+const run = async () => {
+  dotenv.config();
+  const notionDB = new NotionDB(process.env.NOTION_API_KEY as string);
+  const database = await notionDB.getDatabaseRef(
+    new NotionUrl(process.env.NOTION_DB_URL as string),
+  );
+  const pages = await database.pages.getAll(['Receipts', 'test']);
+  // console.log('pages', pages);
+};
+
+run();
