@@ -1,4 +1,6 @@
-import { PageResponse, NotionProperty } from '../notion/types';
+import { NotionProperty } from '../notion/types';
+import Page from '../page';
+import { User } from '../user';
 declare class Database {
     #private;
     constructor(id: string, title: string, properties: NotionProperty[]);
@@ -6,8 +8,13 @@ declare class Database {
     get title(): string;
     get properties(): NotionProperty[];
     get pages(): {
+        get: typeof Page.get;
         getAll: (excludeProperties?: string[] | undefined) => Promise<Record<string, any>[]>;
+        create: (data: Record<string, any>) => Promise<Page>;
     };
-    createPage(data: Record<string, any>): Promise<PageResponse | undefined>;
+    get users(): {
+        get: typeof User.get;
+        getAll: typeof User.getAll;
+    };
 }
 export default Database;

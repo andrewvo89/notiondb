@@ -123,8 +123,7 @@ const run = async () => {
   const database = await notionDB.getDatabaseRef(
     new NotionUrl(process.env.NOTION_DB_URL as string),
   );
-  const pages = await database.pages.getAll(['Receipts', 'test']);
-  // console.log('pages', pages);
+  const pages = await database.pages.getAll();
 };
 
 run();

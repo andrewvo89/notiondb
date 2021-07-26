@@ -1,4 +1,4 @@
-import { CheckboxNotionValue, DateNotionValue, DateOptions, EmailNotionValue, MultiSelectNotionValue, NumberNotionValue, PhoneNumberNotionValue, PropertyData, RichTextNotionValue, SelectNotionValue, TitleNotionValue, URLNotionValue } from './types';
+import { CheckboxNotionValue, DateNotionValue, DateOptions, EmailNotionValue, MultiSelectNotionValue, NumberNotionValue, PeopleNotionValue, PhoneNumberNotionValue, PropertyData, RichTextNotionValue, SelectNotionValue, TitleNotionValue, URLNotionValue } from './types';
 declare class Title implements PropertyData {
     #private;
     constructor(value: string);
@@ -64,4 +64,17 @@ declare class PhoneNumber implements PropertyData {
     get notionValue(): PhoneNumberNotionValue;
     static getValue(notionValue: PhoneNumberNotionValue): string;
 }
-export { Title, RichText, Number, Select, MultiSelect, Date, Checkbox, URL, Email, PhoneNumber, };
+declare class People implements PropertyData {
+    #private;
+    constructor(value: string);
+    get notionValue(): {
+        people: string;
+    };
+    static getValue(notionValue: PeopleNotionValue): {
+        id: string;
+        name: string;
+        avatar: string;
+        email?: string | undefined;
+    }[];
+}
+export { Title, RichText, Number, Select, MultiSelect, Date, Checkbox, URL, Email, PhoneNumber, People, };

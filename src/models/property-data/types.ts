@@ -415,6 +415,20 @@ interface PhoneNumberNotionValue {
   phone_number: string;
 }
 
+interface PeopleNotionValue {
+  people: {
+    object: 'user';
+    id: string;
+    name: string;
+    avatar_url: string;
+    type: 'person' | 'bot';
+    person?: {
+      email: string;
+    };
+    bot?: {};
+  }[];
+}
+
 export {
   PropertyData,
   DateOptions,
@@ -428,4 +442,5 @@ export {
   URLNotionValue,
   EmailNotionValue,
   PhoneNumberNotionValue,
+  PeopleNotionValue,
 };
