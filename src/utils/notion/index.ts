@@ -1,9 +1,12 @@
 import { validate as uuidValidate } from 'uuid';
-import NotionId from '../../models/notion/notion-id';
-import NotionUrl from '../../models/notion/notion-url';
+import { NotionUrlTypes } from '../../models/notion/notion-url/types';
 
-function getIdFromUrl(notionUrl: NotionUrl): string {
-  const id = notionUrl.url.split('/').pop()?.substring(0, 32) as string;
+function getIdFromUrl(url: string, type: NotionUrlTypes): string {
+  const id = (
+    type === NotionUrlTypes.DATABASE
+      ? url.split('/').pop()?.substring(0, 32)
+      : url.substring(url.length - 32)
+  ) as string;
   const uuidv4 = transformStringToUUID(id);
   if (!uuidValidate(uuidv4)) {
     throw new Error('URL supplied was not valid.');
@@ -11,8 +14,7 @@ function getIdFromUrl(notionUrl: NotionUrl): string {
   return id;
 }
 
-function getIdFromId(notionId: NotionId): string {
-  const id = notionId.id;
+function getIdFromId(id: string): string {
   const uuidv4 = transformStringToUUID(id);
   if (!uuidValidate(uuidv4)) {
     throw new Error('ID supplied was not valid.');

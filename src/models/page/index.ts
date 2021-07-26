@@ -15,6 +15,9 @@ import {
 } from '../property-data';
 import { NotionProperty, NotionPropertyData } from '../notion/types';
 import { PropertyData } from '../property-data/types';
+import NotionUrl from '../notion/notion-url';
+import NotionId from '../notion/notion-id';
+import { getIdFromUrl } from '../../utils/notion';
 class Page {
   #id: string;
   #url: string;
@@ -41,7 +44,52 @@ class Page {
     return this.#archived;
   }
 
-  static async get() {}
+  static async get(
+    identifer: NotionUrl | NotionId,
+    excludeProperties?: string[],
+  ) {
+    const pageId = identifer.getId();
+    let retries = 0;
+    let page: Page | null = null;
+    do {
+      try {
+        const response = await axios.get(`/pages/${pageId}`);
+        const pageResponse = response.data as PageResponse;
+        const properties = Object.entries(pageResponse.properties).reduce(
+          (properties: Record<string, any>, [propertyName, value]) => {
+            if (excludeProperties?.includes(propertyName)) {
+              return properties;
+            }
+            return {
+              ...properties,
+              [propertyName]: transformFromNotionProperties(value),
+            };
+          },
+          {},
+        );
+        page = new Page(
+          pageResponse.id,
+          pageResponse.url,
+          properties,
+          pageResponse.archived,
+        );
+      } catch (error) {
+        if (retries === MAX_RETRIES) {
+          break;
+        }
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            retries++;
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
+      }
+    } while (!page);
+    if (!page) {
+      throw new Error(`Page ${pageId} does not exist.`);
+    }
+    return page;
+  }
 
   static async getAll(
     databaseId: string,

@@ -1,5 +1,4 @@
-import NotionId from '../../models/notion/notion-id';
-import NotionUrl from '../../models/notion/notion-url';
-declare function getIdFromUrl(notionUrl: NotionUrl): string;
-declare function getIdFromId(notionId: NotionId): string;
+import { NotionUrlTypes } from '../../models/notion/notion-url/types';
+declare function getIdFromUrl(url: string, type: NotionUrlTypes): string;
+declare function getIdFromId(id: string): string;
 export { getIdFromUrl, getIdFromId };

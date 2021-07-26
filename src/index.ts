@@ -5,11 +5,11 @@ import { NotionProperty } from './models/notion/types';
 import dotenv from 'dotenv';
 import NotionUrl from './models/notion/notion-url';
 import NotionId from './models/notion/notion-id';
-import { getIdFromId, getIdFromUrl } from './utils/notion';
+import { NotionUrlTypes } from './models/notion/notion-url/types';
 
 class NotionDB {
   constructor(integrationToken: string) {
-    axios.defaults.headers.common['Authorization'] = integrationToken;
+    axios.defaults.headers.common.Authorization = integrationToken;
   }
 
   async getAllDatabases(): Promise<Database[]> {
@@ -43,9 +43,9 @@ class NotionDB {
           );
           databases.push(database);
         }
-        hasMore = response.data['has_more'];
+        hasMore = response.data.has_more;
         if (hasMore) {
-          nextCursor = response.data['next_cursor'];
+          nextCursor = response.data.next_cursor;
         }
       } catch (error) {
         if (retries === MAX_RETRIES) {
@@ -63,19 +63,14 @@ class NotionDB {
   }
 
   async getDatabaseRef(identifer: NotionUrl | NotionId): Promise<Database> {
-    let databaseId: string = '';
-    if (identifer instanceof NotionUrl) {
-      databaseId = getIdFromUrl(identifer);
-    } else if (identifer instanceof NotionId) {
-      databaseId = getIdFromId(identifer);
-    }
+    const databaseId = identifer.getId();
     let retries = 0;
     let database: Database | null = null;
     do {
       try {
         const response = await axios.get(`/databases/${databaseId}`);
-        const result = response.data as DatabaseResponse;
-        const properties = Object.values(result.properties).map(
+        const databaseResult = response.data as DatabaseResponse;
+        const properties = Object.values(databaseResult.properties).map(
           (property) =>
             ({
               id: property.id,
@@ -84,7 +79,11 @@ class NotionDB {
               value: property[property.type],
             } as NotionProperty),
         );
-        database = new Database(result.id, result.title.plain_text, properties);
+        database = new Database(
+          databaseResult.id,
+          databaseResult.title.plain_text,
+          properties,
+        );
       } catch (error) {
         if (retries === MAX_RETRIES) {
           break;
@@ -110,14 +109,17 @@ const run = async () => {
   dotenv.config();
   const notionDB = new NotionDB(process.env.NOTION_API_KEY as string);
   const database = await notionDB.getDatabaseRef(
-    new NotionUrl(process.env.NOTION_DB_URL as string),
+    new NotionUrl(process.env.NOTION_DB_URL as string, NotionUrlTypes.DATABASE),
+  );
+  const page = await database.pages.get(
+    new NotionUrl(process.env.NOTION_PAGE_URL as string, NotionUrlTypes.PAGE),
   );
   // const pages = await database.pages.getAll();
-  const createdPage = await database.pages.create({
-    Name: 'hello delete me right away, then restore me',
-  });
-  const deletedPage = await createdPage.delete();
-  const restoredPage = await deletedPage.restore();
+  // const createdPage = await database.pages.create({
+  //   Name: 'hello delete me right away, then restore me',
+  // });
+  // const deletedPage = await createdPage.delete();
+  // const restoredPage = await deletedPage.restore();
 };
 
 run();
