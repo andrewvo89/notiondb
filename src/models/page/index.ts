@@ -13,24 +13,32 @@ import {
   Title,
   URL,
 } from '../property-data';
-import { AxiosError } from 'axios';
 import { NotionProperty, NotionPropertyData } from '../notion/types';
-import { User } from '../user';
-import { UserResponse } from '../user/types';
 import { PropertyData } from '../property-data/types';
 class Page {
   #id: string;
   #url: string;
   #properties: Record<string, any>;
+  #archived: boolean;
 
-  constructor(id: string, url: string, properties: Record<string, any>) {
+  constructor(
+    id: string,
+    url: string,
+    properties: Record<string, any>,
+    archived: boolean,
+  ) {
     this.#id = id;
     this.#url = url;
     this.#properties = properties;
+    this.#archived = archived;
   }
 
   get properties() {
     return this.#properties;
+  }
+
+  get archived() {
+    return this.#archived;
   }
 
   static async get() {}
@@ -56,8 +64,8 @@ class Page {
           continue;
         }
 
-        const pageProperties = results.map((result: PageResponse) => {
-          const properties = Object.entries(result.properties).reduce(
+        const pageProperties = results.map((pageResponse: PageResponse) => {
+          const properties = Object.entries(pageResponse.properties).reduce(
             (properties: Record<string, any>, [propertyName, value]) => {
               if (excludeProperties?.includes(propertyName)) {
                 return properties;
@@ -69,7 +77,12 @@ class Page {
             },
             {},
           );
-          const page = new Page(result.id, result.url, properties);
+          const page = new Page(
+            pageResponse.id,
+            pageResponse.url,
+            properties,
+            pageResponse.archived,
+          );
           return page.properties;
         });
         pages.push(...pageProperties);
@@ -77,20 +90,16 @@ class Page {
         if (hasMore) {
           nextCursor = response.data['next_cursor'];
         }
-      } catch (e) {
-        console.error(e);
-        const error = e as AxiosError;
-        if (error.isAxiosError && error.response?.status === 404) {
-          await new Promise((resolve) =>
-            globalThis.setTimeout(() => {
-              resolve(null);
-            }, BACK_OFF_TIME),
-          );
-        }
+      } catch (error) {
         if (retries === MAX_RETRIES) {
           continue;
         }
-        retries++;
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            retries++;
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
       }
     } while (hasMore);
     return pages;
@@ -101,21 +110,86 @@ class Page {
     notionProperties: NotionProperty[],
     data: Record<string, any>,
   ): Promise<Page> {
-    try {
-      const propertyNames = Object.keys(data);
-      const { valid, errors } = validatePropertiesExist(
-        propertyNames,
-        notionProperties,
-      );
-      if (!valid) {
-        throw new Error(errors.join(', '));
+    let retries = 0;
+    const propertyNames = Object.keys(data);
+    const { valid, errors } = validatePropertiesExist(
+      propertyNames,
+      notionProperties,
+    );
+    if (!valid) {
+      throw new Error(errors.join(', '));
+    }
+
+    let page: Page | null = null;
+    do {
+      try {
+        const response = await axios.post(`/pages`, {
+          parent: {
+            type: 'database_id',
+            database_id: databaseId,
+          },
+          properties: transformToNotionProperties(notionProperties, data),
+        });
+        const pageResponse = response.data as PageResponse;
+        const properties = Object.entries(pageResponse.properties).reduce(
+          (properties: Record<string, any>, [propertyName, value]) => {
+            return {
+              ...properties,
+              [propertyName]: transformFromNotionProperties(value),
+            };
+          },
+          {},
+        );
+        page = new Page(
+          pageResponse.id,
+          pageResponse.url,
+          properties,
+          pageResponse.archived,
+        );
+      } catch (error) {
+        if (retries === MAX_RETRIES) {
+          break;
+        }
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            retries++;
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
       }
-      const response = await axios.post(`/pages`, {
-        parent: {
-          type: 'database_id',
-          database_id: databaseId,
-        },
-        properties: transformToNotionProperties(notionProperties, data),
+    } while (!page);
+    if (!page) {
+      throw new Error(`Page failed to create.`);
+    }
+    return page;
+  }
+
+  update() {}
+
+  async restore(): Promise<Page> {
+    if (!this.#archived) {
+      throw new Error(`Page ${this.#id} is already active.`);
+    }
+    return await setArchived(this.#id, false);
+  }
+
+  async delete(): Promise<Page> {
+    if (this.#archived) {
+      throw new Error(`Page ${this.#id} has already been deleted.`);
+    }
+    return await setArchived(this.#id, true);
+  }
+}
+
+export default Page;
+
+async function setArchived(pageId: string, archived: boolean) {
+  let retries = 0;
+  let page: Page | null = null;
+  do {
+    try {
+      const response = await axios.patch(`/pages/${pageId}`, {
+        archived,
       });
       const pageResponse = response.data as PageResponse;
       const properties = Object.entries(pageResponse.properties).reduce(
@@ -127,17 +201,30 @@ class Page {
         },
         {},
       );
-      return new Page(pageResponse.id, pageResponse.url, properties);
+      page = new Page(
+        pageResponse.id,
+        pageResponse.url,
+        properties,
+        pageResponse.archived,
+      );
     } catch (error) {
-      console.error(error);
-      throw new Error(error);
+      if (retries === MAX_RETRIES) {
+        break;
+      }
+      await new Promise((resolve) =>
+        globalThis.setTimeout(() => {
+          retries++;
+          resolve(null);
+        }, BACK_OFF_TIME),
+      );
     }
+  } while (!page);
+  if (!page) {
+    const action = archived ? 'delete' : 'restore';
+    throw new Error(`Page ${pageId} failed to ${action}.`);
   }
-
-  update() {}
+  return page;
 }
-
-export default Page;
 
 function validatePropertiesExist(
   propertyNames: string[],

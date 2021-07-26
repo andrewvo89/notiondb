@@ -74,20 +74,16 @@ class User {
         } else {
           user = new User(result.id, result.name, result.avatar_url);
         }
-      } catch (e) {
-        console.error(e);
-        const error = e as AxiosError;
-        if (error.isAxiosError && error.response?.status === 404) {
-          await new Promise((resolve) =>
-            globalThis.setTimeout(() => {
-              resolve(null);
-            }, BACK_OFF_TIME),
-          );
-        }
+      } catch (error) {
         if (retries === MAX_RETRIES) {
           break;
         }
-        retries++;
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            retries++;
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
       }
     } while (!user);
     if (!user) {

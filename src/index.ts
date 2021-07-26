@@ -2,7 +2,6 @@ import Database from './models/database';
 import { DatabaseResponse } from './models/database/types';
 import axios, { BACK_OFF_TIME, MAX_RETRIES } from './utils/api';
 import { NotionProperty } from './models/notion/types';
-import { AxiosError } from 'axios';
 import dotenv from 'dotenv';
 import NotionUrl from './models/notion/notion-url';
 import NotionId from './models/notion/notion-id';
@@ -48,22 +47,16 @@ class NotionDB {
         if (hasMore) {
           nextCursor = response.data['next_cursor'];
         }
-      } catch (e) {
-        console.error(e.message);
-        retries++;
-
+      } catch (error) {
         if (retries === MAX_RETRIES) {
           continue;
         }
-
-        const error = e as AxiosError;
-        if (error.isAxiosError && error.response?.status === 404) {
-          await new Promise((resolve) =>
-            globalThis.setTimeout(() => {
-              resolve(null);
-            }, BACK_OFF_TIME),
-          );
-        }
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            retries++;
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
       }
     } while (hasMore);
     return databases;
@@ -92,20 +85,16 @@ class NotionDB {
             } as NotionProperty),
         );
         database = new Database(result.id, result.title.plain_text, properties);
-      } catch (e) {
-        console.error(e);
-        const error = e as AxiosError;
-        if (error.isAxiosError && error.response?.status === 404) {
-          await new Promise((resolve) =>
-            globalThis.setTimeout(() => {
-              resolve(null);
-            }, BACK_OFF_TIME),
-          );
-        }
+      } catch (error) {
         if (retries === MAX_RETRIES) {
           break;
         }
-        retries++;
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            retries++;
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
       }
     } while (!database);
     if (!database) {
@@ -123,7 +112,12 @@ const run = async () => {
   const database = await notionDB.getDatabaseRef(
     new NotionUrl(process.env.NOTION_DB_URL as string),
   );
-  const pages = await database.pages.getAll();
+  // const pages = await database.pages.getAll();
+  const createdPage = await database.pages.create({
+    Name: 'hello delete me right away, then restore me',
+  });
+  const deletedPage = await createdPage.delete();
+  const restoredPage = await deletedPage.restore();
 };
 
 run();
