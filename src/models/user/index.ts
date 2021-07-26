@@ -53,6 +53,10 @@ class User {
             : new User(result.id, result.name, result.avatar_url),
         ),
       );
+      hasMore = response.data.has_more;
+      if (hasMore) {
+        nextCursor = response.data.next_cursor;
+      }
     } while (hasMore);
     return users;
   }

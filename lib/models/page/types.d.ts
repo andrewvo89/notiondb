@@ -1,3 +1,4 @@
+import { Filter } from '../filter/types';
 import { NotionPropertyData } from '../notion/types';
 interface PageResponse {
     object: 'page';
@@ -12,4 +13,8 @@ interface PageResponse {
     properties: Record<string, NotionPropertyData>;
     url: string;
 }
-export { PageResponse };
+interface PageOptions {
+    filter?: Filter;
+    excludeProperties?: string[];
+}
+export { PageResponse, PageOptions };

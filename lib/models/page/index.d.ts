@@ -1,3 +1,4 @@
+import { PageOptions } from './types';
 import { NotionProperty } from '../notion/types';
 import NotionUrl from '../notion/notion-url';
 import NotionId from '../notion/notion-id';
@@ -7,9 +8,9 @@ declare class Page {
     get properties(): Record<string, any>;
     get archived(): boolean;
     static get(identifer: NotionUrl | NotionId, excludeProperties?: string[]): Promise<Page>;
+    static getMany(databaseId: string, options: PageOptions): Promise<Record<string, any>[]>;
     static getAll(databaseId: string, excludeProperties?: string[]): Promise<Record<string, any>[]>;
     static create(databaseId: string, notionProperties: NotionProperty[], data: Record<string, any>): Promise<Page>;
-    update(): void;
     restore(): Promise<Page>;
     delete(): Promise<Page>;
 }

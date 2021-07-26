@@ -41,6 +41,6 @@ dist/**/*
 yarn.lock
 
 typings/
-lib/*.js
+lib
 test/*.js
 *.map

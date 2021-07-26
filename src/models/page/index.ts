@@ -1,5 +1,5 @@
 import axios, { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
-import { PageResponse } from './types';
+import { PageOptions, PageResponse } from './types';
 import {
   Checkbox,
   Date,
@@ -17,7 +17,6 @@ import { NotionProperty, NotionPropertyData } from '../notion/types';
 import { PropertyData } from '../property-data/types';
 import NotionUrl from '../notion/notion-url';
 import NotionId from '../notion/notion-id';
-import { getIdFromUrl } from '../../utils/notion';
 class Page {
   #id: string;
   #url: string;
@@ -56,12 +55,12 @@ class Page {
         const response = await axios.get(`/pages/${pageId}`);
         const pageResponse = response.data as PageResponse;
         const properties = Object.entries(pageResponse.properties).reduce(
-          (properties: Record<string, any>, [propertyName, value]) => {
+          (prevProperties: Record<string, any>, [propertyName, value]) => {
             if (excludeProperties?.includes(propertyName)) {
-              return properties;
+              return prevProperties;
             }
             return {
-              ...properties,
+              ...prevProperties,
               [propertyName]: transformFromNotionProperties(value),
             };
           },
@@ -91,6 +90,70 @@ class Page {
     return page;
   }
 
+  static async getMany(databaseId: string, options: PageOptions) {
+    let hasMore: boolean = false;
+    let nextCursor: string = '';
+    const pages: Record<string, any>[] = [];
+    do {
+      let retries = 0;
+      try {
+        const nextCursorParam: string = hasMore
+          ? `?start_cursor=${nextCursor}`
+          : '';
+        const requestOptions: { filter?: Record<string, any> } = {};
+        if (options.filter) {
+          requestOptions.filter = options.filter.transformToNotionFilter();
+        }
+        const response = await axios.post(
+          `/databases/${databaseId}/query${nextCursorParam}`,
+          requestOptions,
+        );
+        const results = response.data.results as PageResponse[];
+        if (results.length === 0) {
+          continue;
+        }
+
+        const pageProperties = results.map((pageResponse: PageResponse) => {
+          const properties = Object.entries(pageResponse.properties).reduce(
+            (prevProperties: Record<string, any>, [propertyName, value]) => {
+              if (options?.excludeProperties?.includes(propertyName)) {
+                return prevProperties;
+              }
+              return {
+                ...prevProperties,
+                [propertyName]: transformFromNotionProperties(value),
+              };
+            },
+            {},
+          );
+          const page = new Page(
+            pageResponse.id,
+            pageResponse.url,
+            properties,
+            pageResponse.archived,
+          );
+          return page.properties;
+        });
+        pages.push(...pageProperties);
+        hasMore = response.data.has_more;
+        if (hasMore) {
+          nextCursor = response.data.next_cursor;
+        }
+      } catch (error) {
+        if (retries === MAX_RETRIES) {
+          continue;
+        }
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            retries++;
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
+      }
+    } while (hasMore);
+    return pages;
+  }
+
   static async getAll(
     databaseId: string,
     excludeProperties?: string[],
@@ -114,12 +177,12 @@ class Page {
 
         const pageProperties = results.map((pageResponse: PageResponse) => {
           const properties = Object.entries(pageResponse.properties).reduce(
-            (properties: Record<string, any>, [propertyName, value]) => {
+            (prevProperties: Record<string, any>, [propertyName, value]) => {
               if (excludeProperties?.includes(propertyName)) {
-                return properties;
+                return prevProperties;
               }
               return {
-                ...properties,
+                ...prevProperties,
                 [propertyName]: transformFromNotionProperties(value),
               };
             },
@@ -134,9 +197,9 @@ class Page {
           return page.properties;
         });
         pages.push(...pageProperties);
-        hasMore = response.data['has_more'];
+        hasMore = response.data.has_more;
         if (hasMore) {
-          nextCursor = response.data['next_cursor'];
+          nextCursor = response.data.next_cursor;
         }
       } catch (error) {
         if (retries === MAX_RETRIES) {
@@ -180,9 +243,9 @@ class Page {
         });
         const pageResponse = response.data as PageResponse;
         const properties = Object.entries(pageResponse.properties).reduce(
-          (properties: Record<string, any>, [propertyName, value]) => {
+          (prevProperties: Record<string, any>, [propertyName, value]) => {
             return {
-              ...properties,
+              ...prevProperties,
               [propertyName]: transformFromNotionProperties(value),
             };
           },
@@ -212,7 +275,7 @@ class Page {
     return page;
   }
 
-  update() {}
+  // update() {}
 
   async restore(): Promise<Page> {
     if (!this.#archived) {
@@ -241,9 +304,9 @@ async function setArchived(pageId: string, archived: boolean) {
       });
       const pageResponse = response.data as PageResponse;
       const properties = Object.entries(pageResponse.properties).reduce(
-        (properties: Record<string, any>, [propertyName, value]) => {
+        (prevProperties: Record<string, any>, [propertyName, value]) => {
           return {
-            ...properties,
+            ...prevProperties,
             [propertyName]: transformFromNotionProperties(value),
           };
         },
@@ -316,6 +379,7 @@ function transformToNotionProperties(
           propertyData = new RichText(value);
           break;
         case 'number':
+          // tslint:disable-next-line: no-construct
           propertyData = new Number(value);
           break;
         case 'select':
@@ -380,7 +444,7 @@ function transformFromNotionProperties(propertyData: NotionPropertyData): any {
       const type = propertyData.formula.type;
       return transformFromNotionProperties({
         id: propertyData.id,
-        type: type,
+        type,
         [type]: propertyData.formula[type],
       });
     }

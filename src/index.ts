@@ -6,6 +6,12 @@ import dotenv from 'dotenv';
 import NotionUrl from './models/notion/notion-url';
 import NotionId from './models/notion/notion-id';
 import { NotionUrlTypes } from './models/notion/notion-url/types';
+import NumberFilter from './models/filter/number-filter';
+import { TextFilterTypes } from './models/filter/text-filter/types';
+import { NumberFilterTypes } from './models/filter/number-filter/types';
+import TextFilter from './models/filter/text-filter';
+import CompoundFilter from './models/filter/compound-filter';
+import { CompountFilterTypes } from './models/filter/compound-filter/types';
 
 class NotionDB {
   constructor(integrationToken: string) {
@@ -114,6 +120,36 @@ const run = async () => {
   const page = await database.pages.get(
     new NotionUrl(process.env.NOTION_PAGE_URL as string, NotionUrlTypes.PAGE),
   );
+
+  const filter1 = new NumberFilter(
+    'Recurring Period (Months)',
+    NumberFilterTypes.EQUALS,
+    12,
+  );
+
+  const filter2 = new TextFilter('Notes', TextFilterTypes.CONTAINS, 'Credit');
+
+  const compountFilter = new CompoundFilter(
+    filter1,
+    CompountFilterTypes.OR,
+    filter2,
+  );
+
+  const filter3 = new NumberFilter(
+    'Annual Price',
+    NumberFilterTypes.EQUALS,
+    24.99,
+  );
+
+  const filter = new CompoundFilter(
+    compountFilter,
+    CompountFilterTypes.AND,
+    filter3,
+  );
+
+  const pages = await database.pages.getMany({
+    filter: filter2,
+  });
   // const pages = await database.pages.getAll();
   // const createdPage = await database.pages.create({
   //   Name: 'hello delete me right away, then restore me',

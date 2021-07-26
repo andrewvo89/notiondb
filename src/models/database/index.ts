@@ -1,5 +1,6 @@
 import { NotionProperty } from '../notion/types';
 import Page from '../page';
+import { PageOptions } from '../page/types';
 
 import { User } from '../user';
 
@@ -29,6 +30,7 @@ class Database {
   get pages() {
     return {
       get: Page.get,
+      getMany: (options: PageOptions) => Page.getMany(this.#id, options),
       getAll: (excludeProperties?: string[]) =>
         Page.getAll(this.#id, excludeProperties),
       create: (data: Record<string, any>) =>
