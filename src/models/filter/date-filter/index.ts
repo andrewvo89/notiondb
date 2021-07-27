@@ -1,15 +1,15 @@
+import { DateFilterTypes } from './types';
 import { Filter } from '../types';
-import { NumberFilterTypes } from './types';
 
-class NumberFilter implements Filter {
+class DateFilter implements Filter {
   #property: string;
-  #type: NumberFilterTypes;
-  #value: number | boolean;
+  #type: DateFilterTypes;
+  #value: string | boolean | object;
 
   constructor(
     property: string,
-    type: NumberFilterTypes,
-    value: number | boolean,
+    type: DateFilterTypes,
+    value: string | boolean | object,
   ) {
     this.#property = property;
     this.#type = type;
@@ -27,11 +27,11 @@ class NumberFilter implements Filter {
   transformToNotionFilter() {
     return {
       property: this.#property,
-      number: {
+      date: {
         [this.#type]: this.#value,
       },
     };
   }
 }
 
-export default NumberFilter;
+export default DateFilter;

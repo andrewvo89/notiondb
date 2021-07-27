@@ -1,16 +1,12 @@
+import { FileFilterTypes } from './types';
 import { Filter } from '../types';
-import { TextFilterTypes } from './types';
 
-class TextFilter implements Filter {
+class FileFilter implements Filter {
   #property: string;
-  #type: TextFilterTypes;
-  #value: string | boolean;
+  #type: FileFilterTypes;
+  #value: boolean;
 
-  constructor(
-    property: string,
-    type: TextFilterTypes,
-    value: string | boolean,
-  ) {
+  constructor(property: string, type: FileFilterTypes, value: boolean) {
     this.#property = property;
     this.#type = type;
     this.#value = value;
@@ -20,18 +16,14 @@ class TextFilter implements Filter {
     return this.#property;
   }
 
-  get type() {
-    return this.#type;
-  }
-
   transformToNotionFilter() {
     return {
       property: this.#property,
-      text: {
+      file: {
         [this.#type]: this.#value,
       },
     };
   }
 }
 
-export default TextFilter;
+export default FileFilter;

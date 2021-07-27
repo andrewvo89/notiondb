@@ -1,6 +1,3 @@
-enum CompountFilterTypes {
-  AND = 'and',
-  OR = 'or',
-}
+type CompountFilterTypes = 'and' | 'or';
 
 export { CompountFilterTypes };

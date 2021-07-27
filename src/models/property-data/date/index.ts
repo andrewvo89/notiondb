@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import dayjsTimezone from 'dayjs/plugin/timezone';
-import { PropertyData } from '../types';
+import utc from 'dayjs/plugin/utc';
 import { DateNotionValue, DateOptions } from './types';
+import { PropertyData } from '../types';
 dayjs.extend(utc);
 dayjs.extend(dayjsTimezone);
 

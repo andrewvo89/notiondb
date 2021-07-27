@@ -1,14 +1,14 @@
-import { PageOptions } from './types';
-import { NotionProperty } from '../notion/types';
-import NotionUrl from '../notion/notion-url';
 import NotionId from '../notion/notion-id';
+import NotionUrl from '../notion/notion-url';
+import { NotionProperty } from '../notion/types';
+import { PageOptions } from './types';
 declare class Page {
     #private;
     constructor(id: string, url: string, properties: Record<string, any>, archived: boolean);
     get properties(): Record<string, any>;
     get archived(): boolean;
     static get(identifer: NotionUrl | NotionId, excludeProperties?: string[]): Promise<Page>;
-    static getMany(databaseId: string, options: PageOptions): Promise<Record<string, any>[]>;
+    static getMany(databaseId: string, notionProperties: NotionProperty[], options: PageOptions): Promise<Record<string, any>[]>;
     static getAll(databaseId: string, excludeProperties?: string[]): Promise<Record<string, any>[]>;
     static create(databaseId: string, notionProperties: NotionProperty[], data: Record<string, any>): Promise<Page>;
     restore(): Promise<Page>;

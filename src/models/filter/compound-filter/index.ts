@@ -1,5 +1,5 @@
-import { Filter } from '../types';
 import { CompountFilterTypes } from './types';
+import { Filter } from '../types';
 
 class CompoundFilter implements Filter {
   #filter1: Filter;
@@ -10,6 +10,14 @@ class CompoundFilter implements Filter {
     this.#filter1 = filter1;
     this.#type = type;
     this.#filter2 = filter2;
+  }
+
+  get filter1() {
+    return this.#filter1;
+  }
+
+  get filter2() {
+    return this.#filter2;
   }
 
   transformToNotionFilter(): Record<string, any> {

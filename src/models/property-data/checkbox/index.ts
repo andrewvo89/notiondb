@@ -1,5 +1,5 @@
-import { PropertyData } from '../types';
 import { CheckboxNotionValue } from './types';
+import { PropertyData } from '../types';
 
 class Checkbox implements PropertyData {
   #value: boolean;

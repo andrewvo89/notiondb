@@ -1,17 +1,19 @@
-import { PropertyData } from '../types';
 import { PeopleNotionValue } from './types';
+import { PropertyData } from '../types';
 
 class People implements PropertyData {
-  #value: string;
+  #values: string[];
 
-  constructor(value: string) {
-    this.#value = value;
+  constructor(values: string[]) {
+    this.#values = values;
   }
 
   get notionValue() {
     return {
-      // TODO: implement writing person into database
-      people: this.#value,
+      people: this.#values.map((value) => ({
+        object: 'user',
+        id: value,
+      })),
     };
   }
 

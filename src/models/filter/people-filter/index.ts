@@ -1,14 +1,14 @@
 import { Filter } from '../types';
-import { NumberFilterTypes } from './types';
+import { PeopleFilterTypes } from './types';
 
-class NumberFilter implements Filter {
+class PeopleFilter implements Filter {
   #property: string;
-  #type: NumberFilterTypes;
+  #type: PeopleFilterTypes;
   #value: number | boolean;
 
   constructor(
     property: string,
-    type: NumberFilterTypes,
+    type: PeopleFilterTypes,
     value: number | boolean,
   ) {
     this.#property = property;
@@ -20,18 +20,14 @@ class NumberFilter implements Filter {
     return this.#property;
   }
 
-  get type() {
-    return this.#type;
-  }
-
   transformToNotionFilter() {
     return {
       property: this.#property,
-      number: {
+      people: {
         [this.#type]: this.#value,
       },
     };
   }
 }
 
-export default NumberFilter;
+export default PeopleFilter;

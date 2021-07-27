@@ -1,22 +1,15 @@
 import axios, { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
+import NotionId from '../notion/notion-id';
+import NotionUrl from '../notion/notion-url';
+import { NotionProperty } from '../notion/types';
 import { PageOptions, PageResponse } from './types';
 import {
-  Checkbox,
-  Date,
-  Email,
-  MultiSelect,
-  Number,
-  People,
-  PhoneNumber,
-  RichText,
-  Select,
-  Title,
-  URL,
-} from '../property-data';
-import { NotionProperty, NotionPropertyData } from '../notion/types';
-import { PropertyData } from '../property-data/types';
-import NotionUrl from '../notion/notion-url';
-import NotionId from '../notion/notion-id';
+  transformFromNotionProperties,
+  transformToNotionProperties,
+  validateFilters,
+  validatePropertiesExist,
+  validateSorts,
+} from '../../utils/notion';
 class Page {
   #id: string;
   #url: string;
@@ -90,23 +83,53 @@ class Page {
     return page;
   }
 
-  static async getMany(databaseId: string, options: PageOptions) {
+  static async getMany(
+    databaseId: string,
+    notionProperties: NotionProperty[],
+    options: PageOptions,
+  ) {
+    if (!options.filter && !options.sorts) {
+      throw new Error('Must supply at least one Filter or Sort condition.');
+    }
     let hasMore: boolean = false;
     let nextCursor: string = '';
     const pages: Record<string, any>[] = [];
     do {
       let retries = 0;
       try {
-        const nextCursorParam: string = hasMore
-          ? `?start_cursor=${nextCursor}`
-          : '';
-        const requestOptions: { filter?: Record<string, any> } = {};
+        const bodyParams: {
+          filter?: Record<string, any>;
+          sorts?: Record<string, any>;
+          start_cursor?: string;
+        } = {};
         if (options.filter) {
-          requestOptions.filter = options.filter.transformToNotionFilter();
+          const { valid, errors } = validateFilters(
+            options.filter,
+            notionProperties,
+          );
+          if (!valid) {
+            throw new Error(errors.join(', '));
+          }
+          bodyParams.filter = options.filter.transformToNotionFilter();
+        }
+        if (options.sorts) {
+          const { valid, errors } = validateSorts(
+            options.sorts,
+            notionProperties,
+          );
+          if (!valid) {
+            throw new Error(errors.join(', '));
+          }
+          bodyParams.sorts = options.sorts.map((sort) =>
+            sort.transformToNotionSort(),
+          );
+        }
+        if (hasMore) {
+          bodyParams.start_cursor = nextCursor;
         }
         const response = await axios.post(
-          `/databases/${databaseId}/query${nextCursorParam}`,
-          requestOptions,
+          `/databases/${databaseId}/query`,
+          bodyParams,
         );
         const results = response.data.results as PageResponse[];
         if (results.length === 0) {
@@ -140,6 +163,9 @@ class Page {
           nextCursor = response.data.next_cursor;
         }
       } catch (error) {
+        if (!error.isAxiosError) {
+          throw new Error(error);
+        }
         if (retries === MAX_RETRIES) {
           continue;
         }
@@ -164,11 +190,13 @@ class Page {
     do {
       let retries = 0;
       try {
-        const nextCursorParam: string = hasMore
-          ? `?start_cursor=${nextCursor}`
-          : '';
+        const bodyParams: { start_cursor?: string } = {};
+        if (hasMore) {
+          bodyParams.start_cursor = nextCursor;
+        }
         const response = await axios.post(
-          `/databases/${databaseId}/query${nextCursorParam}`,
+          `/databases/${databaseId}/query`,
+          bodyParams,
         );
         const results = response.data.results as PageResponse[];
         if (results.length === 0) {
@@ -202,6 +230,9 @@ class Page {
           nextCursor = response.data.next_cursor;
         }
       } catch (error) {
+        if (!error.isAxiosError) {
+          throw new Error(error);
+        }
         if (retries === MAX_RETRIES) {
           continue;
         }
@@ -258,6 +289,9 @@ class Page {
           pageResponse.archived,
         );
       } catch (error) {
+        if (!error.isAxiosError) {
+          throw new Error(error);
+        }
         if (retries === MAX_RETRIES) {
           break;
         }
@@ -335,120 +369,4 @@ async function setArchived(pageId: string, archived: boolean) {
     throw new Error(`Page ${pageId} failed to ${action}.`);
   }
   return page;
-}
-
-function validatePropertiesExist(
-  propertyNames: string[],
-  properties: NotionProperty[],
-): {
-  valid: boolean;
-  errors: string[];
-} {
-  const errors: string[] = [];
-  for (const name of propertyNames) {
-    const propertyExists = properties.some(
-      (property) => property.name === name,
-    );
-    if (!propertyExists) {
-      errors.push(`${name} is not a property that exists.`);
-    }
-  }
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
-}
-
-function transformToNotionProperties(
-  properties: NotionProperty[],
-  data: Record<string, any>,
-): Record<string, any> {
-  return Object.entries(data).reduce(
-    (notionProperties: Record<string, any>, dataProperty: [string, any]) => {
-      const [propertyName, value] = dataProperty;
-      const property = properties.find((p) => p.name === propertyName);
-      if (!property) {
-        return notionProperties;
-      }
-      let propertyData: PropertyData;
-      switch (property.type) {
-        case 'title':
-          propertyData = new Title(value);
-          break;
-        case 'rich_text':
-          propertyData = new RichText(value);
-          break;
-        case 'number':
-          // tslint:disable-next-line: no-construct
-          propertyData = new Number(value);
-          break;
-        case 'select':
-          propertyData = new Select(value);
-          break;
-        case 'multi_select':
-          propertyData = new MultiSelect(value);
-          break;
-        case 'date':
-          propertyData = new Date(value);
-          break;
-        case 'checkbox':
-          propertyData = new Checkbox(value);
-          break;
-        case 'url':
-          propertyData = new URL(value);
-          break;
-        case 'email':
-          propertyData = new Email(value);
-          break;
-        case 'phone_number':
-          propertyData = new PhoneNumber(value);
-          break;
-        default:
-          return notionProperties;
-      }
-      return {
-        ...notionProperties,
-        [propertyName]: propertyData.notionValue,
-      };
-    },
-    {},
-  );
-}
-
-function transformFromNotionProperties(propertyData: NotionPropertyData): any {
-  const data = propertyData[propertyData.type];
-  switch (propertyData.type) {
-    case 'title':
-      return Title.getValue({ title: data });
-    case 'rich_text':
-      return RichText.getValue({ rich_text: data });
-    case 'number':
-      return Number.getValue({ number: data });
-    case 'select':
-      return Select.getValue({ select: data });
-    case 'multi_select':
-      return MultiSelect.getValue({ multi_select: data });
-    case 'date':
-      return Date.getValue({ date: data });
-    case 'checkbox':
-      return Checkbox.getValue({ checkbox: data });
-    case 'url':
-      return URL.getValue({ url: data });
-    case 'email':
-      return Email.getValue({ email: data });
-    case 'phone_number':
-      return PhoneNumber.getValue({ phone_number: data });
-    case 'people':
-      return People.getValue({ people: data });
-    case 'formula': {
-      const type = propertyData.formula.type;
-      return transformFromNotionProperties({
-        id: propertyData.id,
-        type,
-        [type]: propertyData.formula[type],
-      });
-    }
-    default:
-      return undefined;
-  }
 }

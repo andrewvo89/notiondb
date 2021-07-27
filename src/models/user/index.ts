@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import axios, { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { UserResponse } from './types';
 

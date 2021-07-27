@@ -1,5 +1,6 @@
 import { Filter } from '../filter/types';
 import { NotionPropertyData } from '../notion/types';
+import { Sort } from '../sort/types';
 interface PageResponse {
     object: 'page';
     id: string;
@@ -15,6 +16,7 @@ interface PageResponse {
 }
 interface PageOptions {
     filter?: Filter;
+    sorts?: Sort[];
     excludeProperties?: string[];
 }
 export { PageResponse, PageOptions };

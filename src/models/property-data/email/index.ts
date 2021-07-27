@@ -1,5 +1,5 @@
-import { PropertyData } from '../types';
 import { EmailNotionValue } from './types';
+import { PropertyData } from '../types';
 
 class Email implements PropertyData {
   #value: string;

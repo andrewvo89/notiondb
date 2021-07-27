@@ -1,4 +1,3 @@
-import { TextFilterTypes } from '../../filter/text-filter/types';
 import { PropertyData } from '../types';
 import { TitleNotionValue } from './types';
 

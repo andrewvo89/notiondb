@@ -1,5 +1,5 @@
-import { PropertyData } from '../types';
 import { PhoneNumberNotionValue } from './types';
+import { PropertyData } from '../types';
 
 class PhoneNumber implements PropertyData {
   #value: string;

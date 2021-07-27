@@ -1,5 +1,5 @@
-import { PropertyData } from '../types';
 import { NumberNotionValue } from './types';
+import { PropertyData } from '../types';
 
 class Number implements PropertyData {
   #value: number;

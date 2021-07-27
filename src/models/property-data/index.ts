@@ -1,14 +1,14 @@
-import Title from './title';
-import RichText from './rich-text';
-import Number from './number';
-import Select from './select';
-import MultiSelect from './multi-select';
-import Date from './date';
 import Checkbox from './checkbox';
-import URL from './url';
+import Date from './date';
 import Email from './email';
-import PhoneNumber from './phone-number';
+import MultiSelect from './multi-select';
+import Number from './number';
 import People from './people';
+import PhoneNumber from './phone-number';
+import RichText from './rich-text';
+import Select from './select';
+import Title from './title';
+import URL from './url';
 
 export {
   Title,

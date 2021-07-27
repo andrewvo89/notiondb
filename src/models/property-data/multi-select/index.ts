@@ -1,5 +1,5 @@
-import { PropertyData } from '../types';
 import { MultiSelectNotionValue } from './types';
+import { PropertyData } from '../types';
 
 class MultiSelect implements PropertyData {
   #values: string[];

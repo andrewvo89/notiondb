@@ -1,16 +1,12 @@
+import { CheckboxFilterTypes } from './types';
 import { Filter } from '../types';
-import { NumberFilterTypes } from './types';
 
-class NumberFilter implements Filter {
+class CheckboxFilter implements Filter {
   #property: string;
-  #type: NumberFilterTypes;
-  #value: number | boolean;
+  #type: CheckboxFilterTypes;
+  #value: boolean;
 
-  constructor(
-    property: string,
-    type: NumberFilterTypes,
-    value: number | boolean,
-  ) {
+  constructor(property: string, type: CheckboxFilterTypes, value: boolean) {
     this.#property = property;
     this.#type = type;
     this.#value = value;
@@ -27,11 +23,11 @@ class NumberFilter implements Filter {
   transformToNotionFilter() {
     return {
       property: this.#property,
-      number: {
+      checkbox: {
         [this.#type]: this.#value,
       },
     };
   }
 }
 
-export default NumberFilter;
+export default CheckboxFilter;

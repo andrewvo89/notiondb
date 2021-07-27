@@ -1,6 +1,6 @@
 import axiosPackage from 'axios';
 
-let axios = axiosPackage.create({
+const axios = axiosPackage.create({
   baseURL: 'https://api.notion.com/v1',
   headers: {
     'Notion-Version': '2021-05-13',
