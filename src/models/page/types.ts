@@ -21,4 +21,13 @@ interface PageOptions {
   sorts?: Sort[];
 }
 
-export { PageResponse, PageOptions };
+interface PageObject {
+  id: string;
+  url: string;
+  archived: boolean;
+  createdTime: globalThis.Date;
+  lastEditedTime: globalThis.Date;
+  properties: Record<string, any>;
+}
+
+export { PageResponse, PageOptions, PageObject };

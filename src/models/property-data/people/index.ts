@@ -1,13 +1,28 @@
-import { PeopleNotionValue } from './types';
+import { PeopleFriendlyValue, PeopleNotionValue } from './types';
 import { PropertyData } from '../types';
 
+/**
+ * Class representing a People Notion type.
+ * @class People
+ * @implements {PropertyData}
+ */
 class People implements PropertyData {
   #values: string[];
 
+  /**
+   * Creates an instance of People.
+   * @param {string[]} values
+   * @memberof People
+   */
   constructor(values: string[]) {
     this.#values = values;
   }
 
+  /**
+   * Transforms value into a Notion friendly value.
+   * @readonly
+   * @memberof People
+   */
   get notionValue() {
     return {
       people: this.#values.map((value) => ({
@@ -17,14 +32,16 @@ class People implements PropertyData {
     };
   }
 
-  static getValue(notionValue: PeopleNotionValue) {
+  /**
+   * Transforms Notion value to a friendly value.
+   * @static
+   * @param {PeopleNotionValue} notionValue
+   * @return {*}  {PeopleFriendlyValue[]}
+   * @memberof People
+   */
+  static getValue(notionValue: PeopleNotionValue): PeopleFriendlyValue[] {
     return notionValue.people.map((person) => {
-      const data: {
-        id: string;
-        name: string;
-        avatar: string;
-        email?: string;
-      } = {
+      const data: PeopleFriendlyValue = {
         id: person.id,
         name: person.name ?? '',
         avatar: person.avatar_url ?? '',

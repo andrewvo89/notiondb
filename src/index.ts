@@ -5,12 +5,26 @@ import NotionUrl from './models/notion/notion-url';
 import { DatabaseResponse } from './models/database/types';
 import { NotionProperty } from './models/notion/types';
 
+/**
+ * Class representing a NotionDB.
+ * @class NotionDB
+ */
 class NotionDB {
+  /**
+   * Creates an instance of NotionDB.
+   * @param {string} integrationToken
+   * @memberof NotionDB
+   */
   constructor(integrationToken: string) {
     axios.defaults.headers.common.Authorization = integrationToken;
   }
 
-  async getAllDatabases(): Promise<Database[]> {
+  /**
+   * Gets all Notion Database References.
+   * @return {*}  {Promise<Database[]>}
+   * @memberof NotionDB
+   */
+  async getAllDatabaseRefs(): Promise<Database[]> {
     const databases: Database[] = [];
     let hasMore: boolean = false;
     let nextCursor: string = '';
@@ -63,6 +77,12 @@ class NotionDB {
     return databases;
   }
 
+  /**
+   * Gets a Notion Database Reference using a Notion URL or Notion ID.
+   * @param {(NotionUrl | NotionId)} identifier
+   * @return {*}  {Promise<Database>}
+   * @memberof NotionDB
+   */
   async getDatabaseRef(identifier: NotionUrl | NotionId): Promise<Database> {
     const databaseId = identifier.getId();
     let retries = 0;

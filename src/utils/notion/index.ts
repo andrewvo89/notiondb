@@ -31,6 +31,12 @@ import {
   URL,
 } from '../../models/property-data';
 
+/**
+ * Parses a Notion URL and returns the Notion ID.
+ * @param {string} url
+ * @param {NotionUrlTypes} type
+ * @return {*}  {string}
+ */
 function getIdFromUrl(url: string, type: NotionUrlTypes): string {
   const id = (
     type === NotionUrlTypes.DATABASE
@@ -44,6 +50,11 @@ function getIdFromUrl(url: string, type: NotionUrlTypes): string {
   return id;
 }
 
+/**
+ * Validates that the ID is a valid UUIDv4.
+ * @param {string} id
+ * @return {*}  {string}
+ */
 function getIdFromId(id: string): string {
   const uuidv4 = transformStringToUUID(id);
   if (!uuidValidate(uuidv4)) {
@@ -52,6 +63,11 @@ function getIdFromId(id: string): string {
   return id;
 }
 
+/**
+ * Transforms a 32 byte string to UUIDv4 format.
+ * @param {string} id
+ * @return {*}  {string}
+ */
 function transformStringToUUID(id: string): string {
   const uuidv4 = `${id.substring(0, 8)}-${id.substring(8, 12)}-${id.substring(
     12,
@@ -60,6 +76,15 @@ function transformStringToUUID(id: string): string {
   return uuidv4;
 }
 
+/**
+ * Validates filter's property names to ensure they are valid Database properties.
+ * @param {Filter} filter
+ * @param {NotionProperty[]} properties
+ * @return {*}  {{
+ *   valid: boolean;
+ *   errors: string[];
+ * }}
+ */
 function validateFilters(
   filter: Filter,
   properties: NotionProperty[],
@@ -71,6 +96,11 @@ function validateFilters(
   return validatePropertiesExist(propertyNames, properties);
 }
 
+/**
+ * Recursively traverses Filter instances to get all property names.
+ * @param {Filter} filter
+ * @return {*}  {string[]}
+ */
 function getFilterPropertyNames(filter: Filter): string[] {
   const propertyNames: string[] = [];
   if (filter instanceof CompoundFilter) {
@@ -96,6 +126,15 @@ function getFilterPropertyNames(filter: Filter): string[] {
   return propertyNames;
 }
 
+/**
+ * Validates sort property names to ensure they are valid Database properties.
+ * @param {Sort[]} sorts
+ * @param {NotionProperty[]} properties
+ * @return {*}  {{
+ *   valid: boolean;
+ *   errors: string[];
+ * }}
+ */
 function validateSorts(
   sorts: Sort[],
   properties: NotionProperty[],
@@ -107,6 +146,11 @@ function validateSorts(
   return validatePropertiesExist(propertyNames, properties);
 }
 
+/**
+ * Gets property names from an array of Sort instances.
+ * @param {Sort[]} sorts
+ * @return {*}  {string[]}
+ */
 function getSortPropertyNames(sorts: Sort[]): string[] {
   return sorts.reduce((prevPropertyNames: string[], sort: Sort) => {
     if (
@@ -119,6 +163,15 @@ function getSortPropertyNames(sorts: Sort[]): string[] {
   }, []);
 }
 
+/**
+ * Validates an array of property names against a Database's properties.
+ * @param {string[]} propertyNames
+ * @param {NotionProperty[]} properties
+ * @return {*}  {{
+ *   valid: boolean;
+ *   errors: string[];
+ * }}
+ */
 function validatePropertiesExist(
   propertyNames: string[],
   properties: NotionProperty[],
@@ -141,6 +194,12 @@ function validatePropertiesExist(
   };
 }
 
+/**
+ * Transforms raw data to Notion friendly data to write to a Notion Database.
+ * @param {NotionProperty[]} properties
+ * @param {Record<string, any>} data
+ * @return {*}  {Record<string, any>}
+ */
 function transformToNotionProperties(
   properties: NotionProperty[],
   data: Record<string, any>,
@@ -197,6 +256,11 @@ function transformToNotionProperties(
   );
 }
 
+/**
+ * Transforms Notion value to a friendly value.
+ * @param {NotionPropertyData} propertyData
+ * @return {*}  {*}
+ */
 function transformFromNotionProperties(propertyData: NotionPropertyData): any {
   const data = propertyData[propertyData.type];
   switch (propertyData.type) {

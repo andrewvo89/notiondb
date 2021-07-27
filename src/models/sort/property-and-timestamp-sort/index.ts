@@ -1,10 +1,22 @@
-import { Sort, SortDirection, TimestampSortType } from '../types';
+import { NotionSort, Sort, SortDirection, TimestampSortType } from '../types';
 
+/**
+ * Class representing a PropertyAndTimestampSort.
+ * @class PropertyAndTimestampSort
+ * @implements {Sort}
+ */
 class PropertyAndTimestampSort implements Sort {
   #property: string;
   #timestamp: TimestampSortType;
   #direction: SortDirection;
 
+  /**
+   * Creates an instance of PropertyAndTimestampSort.
+   * @param {string} property
+   * @param {TimestampSortType} timestamp
+   * @param {SortDirection} direction
+   * @memberof PropertyAndTimestampSort
+   */
   constructor(
     property: string,
     timestamp: TimestampSortType,
@@ -15,11 +27,22 @@ class PropertyAndTimestampSort implements Sort {
     this.#direction = direction;
   }
 
-  get property() {
+  /**
+   * Get the PropertyAndTimestampSort sort property.
+   * @readonly
+   * @type {string}
+   * @memberof PropertyAndTimestampSort
+   */
+  get property(): string {
     return this.#property;
   }
 
-  transformToNotionSort() {
+  /**
+   * Transforms sort into a Notion friendly sort.
+   * @return {*}  {NotionSort}
+   * @memberof PropertyAndTimestampSort
+   */
+  transformToNotionSort(): NotionSort {
     return {
       property: this.#property,
       timestamp: this.#timestamp,

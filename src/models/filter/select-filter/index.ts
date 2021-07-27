@@ -1,11 +1,23 @@
-import { Filter } from '../types';
+import { Filter, NotionPropertyFilter } from '../types';
 import { SelectFilterTypes } from './types';
 
+/**
+ * Class representing a SelectFilter.
+ * @class SelectFilter
+ * @implements {Filter}
+ */
 class SelectFilter implements Filter {
   #property: string;
   #type: SelectFilterTypes;
   #value: string | boolean;
 
+  /**
+   * Creates an instance of SelectFilter.
+   * @param {string} property
+   * @param {SelectFilterTypes} type
+   * @param {(string | boolean)} value
+   * @memberof SelectFilter
+   */
   constructor(
     property: string,
     type: SelectFilterTypes,
@@ -16,11 +28,22 @@ class SelectFilter implements Filter {
     this.#value = value;
   }
 
-  get property() {
+  /**
+   * Get the Select filter property.
+   * @readonly
+   * @type {string}
+   * @memberof SelectFilter
+   */
+  get property(): string {
     return this.#property;
   }
 
-  transformToNotionFilter() {
+  /**
+   * Transforms filter into a Notion friendly filter.
+   * @return {*}  {NotionPropertyFilter}
+   * @memberof SelectFilter
+   */
+  transformToNotionFilter(): NotionPropertyFilter {
     return {
       property: this.#property,
       select: {

@@ -1,11 +1,23 @@
-import { Filter } from '../types';
+import { Filter, NotionPropertyFilter } from '../types';
 import { TextFilterTypes } from './types';
 
+/**
+ * Class representing a TextFilter.
+ * @class TextFilter
+ * @implements {Filter}
+ */
 class TextFilter implements Filter {
   #property: string;
   #type: TextFilterTypes;
   #value: string | boolean;
 
+  /**
+   * Creates an instance of TextFilter.
+   * @param {string} property
+   * @param {TextFilterTypes} type
+   * @param {(string | boolean)} value
+   * @memberof TextFilter
+   */
   constructor(
     property: string,
     type: TextFilterTypes,
@@ -16,15 +28,32 @@ class TextFilter implements Filter {
     this.#value = value;
   }
 
-  get property() {
+  /**
+   * Get the Checkbox Text property.
+   * @readonly
+   * @type {string}
+   * @memberof TextFilter
+   */
+  get property(): string {
     return this.#property;
   }
 
-  get type() {
+  /**
+   * Get the Text filter type.
+   * @readonly
+   * @type {TextFilterTypes}
+   * @memberof TextFilter
+   */
+  get type(): TextFilterTypes {
     return this.#type;
   }
 
-  transformToNotionFilter() {
+  /**
+   * Transforms filter into a Notion friendly filter.
+   * @return {*}  {NotionPropertyFilter}
+   * @memberof TextFilter
+   */
+  transformToNotionFilter(): NotionPropertyFilter {
     return {
       property: this.#property,
       text: {

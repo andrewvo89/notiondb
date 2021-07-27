@@ -1,20 +1,37 @@
 import dayjs from 'dayjs';
 import dayjsTimezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { DateNotionValue, DateOptions } from './types';
+import { DateFriendlyValue, DateNotionValue, DateOptions } from './types';
 import { PropertyData } from '../types';
 dayjs.extend(utc);
 dayjs.extend(dayjsTimezone);
 
+/**
+ * Class representing a Date Notion type.
+ * @class Date
+ * @implements {PropertyData}
+ */
 class Date implements PropertyData {
   #start: globalThis.Date;
   #options?: DateOptions;
 
+  /**
+   * Creates an instance of Date.
+   * @param {globalThis.Date} start
+   * @param {DateOptions} [options]
+   * @memberof Date
+   */
   constructor(start: globalThis.Date, options?: DateOptions) {
     this.#start = start;
     this.#options = options;
   }
 
+  /**
+   * Transforms value into a Notion friendly value.
+   * @readonly
+   * @type {DateNotionValue}
+   * @memberof Date
+   */
   get notionValue(): DateNotionValue {
     const dateProperties: {
       start: string;
@@ -63,11 +80,15 @@ class Date implements PropertyData {
     } as DateNotionValue;
   }
 
-  static getValue(notionValue: DateNotionValue) {
-    const value: {
-      start: globalThis.Date;
-      end?: globalThis.Date;
-    } = {
+  /**
+   * Transforms Notion value to a friendly value.
+   * @static
+   * @param {DateNotionValue} notionValue
+   * @return {*}  {DateFriendlyValue}
+   * @memberof Date
+   */
+  static getValue(notionValue: DateNotionValue): DateFriendlyValue {
+    const value: DateFriendlyValue = {
       start: new globalThis.Date(notionValue.date.start),
     };
     if (notionValue.date.end) {

@@ -1,19 +1,41 @@
-import { Sort, SortDirection } from '../types';
+import { NotionSort, Sort, SortDirection } from '../types';
 
+/**
+ * Class representing a PropertySort.
+ * @class PropertySort
+ * @implements {Sort}
+ */
 class PropertySort implements Sort {
   #property: string;
   #direction: SortDirection;
 
+  /**
+   * Creates an instance of PropertySort.
+   * @param {string} property
+   * @param {SortDirection} direction
+   * @memberof PropertySort
+   */
   constructor(property: string, direction: SortDirection) {
     this.#property = property;
     this.#direction = direction;
   }
 
-  get property() {
+  /**
+   * Get the PropertyAndTimestampSort sort property.
+   * @readonly
+   * @type {string}
+   * @memberof PropertySort
+   */
+  get property(): string {
     return this.#property;
   }
 
-  transformToNotionSort() {
+  /**
+   * Transforms sort into a Notion friendly sort.
+   * @return {*}  {NotionSort}
+   * @memberof PropertySort
+   */
+  transformToNotionSort(): NotionSort {
     return {
       property: this.#property,
       direction: this.#direction,

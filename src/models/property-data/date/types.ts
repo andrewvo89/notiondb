@@ -5,6 +5,11 @@ interface DateNotionValue {
   };
 }
 
+interface DateFriendlyValue {
+  start: globalThis.Date;
+  end?: globalThis.Date;
+}
+
 interface DateOptions {
   end?: globalThis.Date;
   includeTime?: boolean;
@@ -361,4 +366,4 @@ type Timezones =
   | 'Pacific/Apia'
   | 'Africa/Johannesburg';
 
-export { DateNotionValue, DateOptions, Timezones };
+export { DateNotionValue, DateFriendlyValue, DateOptions, Timezones };

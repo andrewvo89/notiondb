@@ -10,4 +10,11 @@ interface UserResponse {
   bot?: {};
 }
 
-export { UserResponse };
+interface UserObject {
+  id: string;
+  name: string;
+  avatar: string;
+  email?: string;
+}
+
+export { UserResponse, UserObject };

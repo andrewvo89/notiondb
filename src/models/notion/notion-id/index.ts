@@ -1,16 +1,31 @@
 import { getIdFromId } from '../../../utils/notion';
 
+/**
+ * Class representing a Notion ID.
+ * @class NotionId
+ */
 class NotionId {
   #id: string;
   constructor(id: string) {
     this.#id = id;
   }
 
-  getId() {
+  /**
+   * Validates the ID.
+   * @return {*}  {string}
+   * @memberof NotionId
+   */
+  getId(): string {
     return getIdFromId(this.#id);
   }
 
-  get id() {
+  /**
+   * Get the Notion ID.
+   * @readonly
+   * @type {string}
+   * @memberof NotionId
+   */
+  get id(): string {
     return this.#id;
   }
 }

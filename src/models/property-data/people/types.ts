@@ -12,4 +12,11 @@ interface PeopleNotionValue {
   }[];
 }
 
-export { PeopleNotionValue };
+interface PeopleFriendlyValue {
+  id: string;
+  name: string;
+  avatar: string;
+  email?: string;
+}
+
+export { PeopleNotionValue, PeopleFriendlyValue };

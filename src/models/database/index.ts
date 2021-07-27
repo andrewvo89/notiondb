@@ -1,33 +1,67 @@
 import NotionId from '../notion/notion-id';
 import NotionUrl from '../notion/notion-url';
 import Page from '../page';
+import User from '../user';
 import { NotionProperty } from '../notion/types';
 import { PageOptions } from '../page/types';
-import { User } from '../user';
 
+/**
+ * Class representing a Notion Database.
+ * @class Database
+ */
 class Database {
   #id: string;
   #title: string;
   #properties: NotionProperty[];
 
+  /**
+   * Creates an instance of Database.
+   * @param {string} id
+   * @param {string} title
+   * @param {NotionProperty[]} properties
+   * @memberof Database
+   */
   constructor(id: string, title: string, properties: NotionProperty[]) {
     this.#id = id;
     this.#title = title;
     this.#properties = properties;
   }
 
-  get id() {
+  /**
+   * Get Database ID.
+   * @readonly
+   * @type {string}
+   * @memberof Database
+   */
+  get id(): string {
     return this.#id;
   }
 
-  get title() {
+  /**
+   * Get Databae title.
+   * @readonly
+   * @type {string}
+   * @memberof Database
+   */
+  get title(): string {
     return this.#title;
   }
 
-  get properties() {
+  /**
+   * Get Database properties.
+   * @readonly
+   * @type {NotionProperty[]}
+   * @memberof Database
+   */
+  get properties(): NotionProperty[] {
     return this.#properties;
   }
 
+  /**
+   * Get access to Database pages.
+   * @readonly
+   * @memberof Database
+   */
   get pages() {
     return {
       get: (identifier: NotionUrl | NotionId, excludeProperties?: string[]) =>
@@ -47,6 +81,11 @@ class Database {
     };
   }
 
+  /**
+   * Get access to Database users.
+   * @readonly
+   * @memberof Database
+   */
   get users() {
     return {
       get: User.get,

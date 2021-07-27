@@ -2,7 +2,7 @@ import axios, { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import NotionId from '../notion/notion-id';
 import NotionUrl from '../notion/notion-url';
 import { NotionProperty } from '../notion/types';
-import { PageOptions, PageResponse } from './types';
+import { PageObject, PageOptions, PageResponse } from './types';
 import {
   transformFromNotionProperties,
   transformToNotionProperties,
@@ -10,6 +10,11 @@ import {
   validatePropertiesExist,
   validateSorts,
 } from '../../utils/notion';
+
+/**
+ * Class representing a Notion Page.
+ * @class Page
+ */
 class Page {
   #id: string;
   #url: string;
@@ -19,6 +24,17 @@ class Page {
   #createdTime: globalThis.Date;
   #lastEditedTime: globalThis.Date;
 
+  /**
+   * Creates an instance of Page.
+   * @param {string} id
+   * @param {string} url
+   * @param {NotionProperty[]} notionProperties
+   * @param {Record<string, any>} properties
+   * @param {boolean} archived
+   * @param {globalThis.Date} createdTime
+   * @param {globalThis.Date} lastEditedTime
+   * @memberof Page
+   */
   constructor(
     id: string,
     url: string,
@@ -37,25 +53,52 @@ class Page {
     this.#lastEditedTime = lastEditedTime;
   }
 
-  get properties() {
+  /**
+   * Gets the property data from the Page.
+   * @readonly
+   * @type {Record<string, any>}
+   * @memberof Page
+   */
+  get properties(): Record<string, any> {
     return this.#properties;
   }
 
-  get archived() {
+  /**
+   * Gets whether or not the Page is archived (deleted).
+   * @readonly
+   * @type {boolean}
+   * @memberof Page
+   */
+  get archived(): boolean {
     return this.#archived;
   }
 
-  get object() {
+  /**
+   * Get the JavaScript object representing the Page.
+   * @readonly
+   * @type {PageObject}
+   * @memberof Page
+   */
+  get object(): PageObject {
     return {
       id: this.#id,
       url: this.#url,
       archived: this.#archived,
-      properties: this.#properties,
       createdTime: this.#createdTime,
       lastEditedTime: this.#lastEditedTime,
+      properties: this.#properties,
     };
   }
 
+  /**
+   * Get the Page using a Notion URL or Notion ID.
+   * @static
+   * @param {NotionProperty[]} notionProperties
+   * @param {(NotionUrl | NotionId)} identifier
+   * @param {string[]} [excludeProperties]
+   * @return {*}  {Promise<Page>}
+   * @memberof Page
+   */
   static async get(
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
@@ -107,6 +150,16 @@ class Page {
     return page;
   }
 
+  /**
+   * Get many Pages with Filter and Sort logic.
+   * @static
+   * @param {string} databaseId
+   * @param {NotionProperty[]} notionProperties
+   * @param {PageOptions} options
+   * @param {string[]} [excludeProperties]
+   * @return {*}  {Promise<Page[]>}
+   * @memberof Page
+   */
   static async getMany(
     databaseId: string,
     notionProperties: NotionProperty[],
@@ -208,6 +261,15 @@ class Page {
     return pages;
   }
 
+  /**
+   * Get all Pages from the Database.
+   * @static
+   * @param {string} databaseId
+   * @param {NotionProperty[]} notionProperties
+   * @param {string[]} [excludeProperties]
+   * @return {*}  {Promise<Page[]>}
+   * @memberof Page
+   */
   static async getAll(
     databaseId: string,
     notionProperties: NotionProperty[],
@@ -279,6 +341,15 @@ class Page {
     return pages;
   }
 
+  /**
+   * Creates a Page.
+   * @static
+   * @param {string} databaseId
+   * @param {NotionProperty[]} notionProperties
+   * @param {Record<string, any>} data
+   * @return {*}  {Promise<Page>}
+   * @memberof Page
+   */
   static async create(
     databaseId: string,
     notionProperties: NotionProperty[],
@@ -344,10 +415,25 @@ class Page {
     return page;
   }
 
+  /**
+   * Updates the current Page.
+   * @param {Record<string, any>} data
+   * @return {*}  {Promise<Page>}
+   * @memberof Page
+   */
   async update(data: Record<string, any>): Promise<Page> {
     return update(this.#notionProperties, this.#id, data);
   }
 
+  /**
+   * Updates a Page using a Notion URL or Notion ID as the identifier.
+   * @static
+   * @param {NotionProperty[]} notionProperties
+   * @param {(NotionUrl | NotionId)} identifier
+   * @param {Record<string, any>} data
+   * @return {*}  {Promise<Page>}
+   * @memberof Page
+   */
   static update(
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
@@ -357,6 +443,11 @@ class Page {
     return update(notionProperties, pageId, data);
   }
 
+  /**
+   * Deletes (archives) the current Page.
+   * @return {*}  {Promise<Page>}
+   * @memberof Page
+   */
   async delete(): Promise<Page> {
     if (this.#archived) {
       throw new Error(`Page ${this.#id} has already been deleted.`);
@@ -364,6 +455,14 @@ class Page {
     return await setArchived(this.#notionProperties, this.#id, true);
   }
 
+  /**
+   * Deletes (archives) a Page using a Notion URL or Notion ID as the identifier.
+   * @static
+   * @param {NotionProperty[]} notionProperties
+   * @param {(NotionUrl | NotionId)} identifier
+   * @return {*}  {Promise<Page>}
+   * @memberof Page
+   */
   static delete(
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
@@ -372,6 +471,11 @@ class Page {
     return setArchived(notionProperties, pageId, true);
   }
 
+  /**
+   * Restores (unarchives) the current Page.
+   * @return {*}  {Promise<Page>}
+   * @memberof Page
+   */
   async restore(): Promise<Page> {
     if (!this.#archived) {
       throw new Error(`Page ${this.#id} is already active.`);
@@ -379,6 +483,14 @@ class Page {
     return await setArchived(this.#notionProperties, this.#id, false);
   }
 
+  /**
+   * Restores (unarchives) a Page using a Notion URL or Notion ID as the identifier.
+   * @static
+   * @param {NotionProperty[]} notionProperties
+   * @param {(NotionUrl | NotionId)} identifier
+   * @return {*}  {Promise<Page>}
+   * @memberof Page
+   */
   static async restore(
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
@@ -390,6 +502,13 @@ class Page {
 
 export default Page;
 
+/**
+ * Updates a a Page using it's Page ID.
+ * @param {NotionProperty[]} notionProperties
+ * @param {string} pageId
+ * @param {Record<string, any>} data
+ * @return {*}  {Promise<Page>}
+ */
 async function update(
   notionProperties: NotionProperty[],
   pageId: string,
@@ -451,6 +570,13 @@ async function update(
   return page;
 }
 
+/**
+ * Archives or unarchives a Page using its Page ID.
+ * @param {NotionProperty[]} notionProperties
+ * @param {string} pageId
+ * @param {boolean} archived
+ * @return {*}
+ */
 async function setArchived(
   notionProperties: NotionProperty[],
   pageId: string,

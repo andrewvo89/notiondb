@@ -1,14 +1,26 @@
-import { Filter } from '../types';
+import { Filter, NotionPropertyFilter } from '../types';
 import { NumberFilterTypes } from './types';
 
+/**
+ * Class representing a NumberFilter.
+ * @class NumberFilter
+ * @implements {Filter}
+ */
 class NumberFilter implements Filter {
   #property: string;
   #type: NumberFilterTypes;
   #value: number | boolean;
 
+  /**
+   * Creates an instance of NumberFilter.
+   * @param {string} property
+   * @param {NumberFilterTypes} type
+   * @param {(number | boolean)} value
+   * @memberof NumberFilter
+   */
   constructor(
     property: string,
-    type: NumberFilterTypes,
+    type: ,
     value: number | boolean,
   ) {
     this.#property = property;
@@ -16,15 +28,32 @@ class NumberFilter implements Filter {
     this.#value = value;
   }
 
-  get property() {
+  /**
+   * Get the Number filter property.
+   * @readonly
+   * @type {string}
+   * @memberof NumberFilter
+   */
+  get property(): string {
     return this.#property;
   }
 
-  get type() {
+  /**
+   * Get the Number filter type.
+   * @readonly
+   * @type {NumberFilterTypes}
+   * @memberof NumberFilter
+   */
+  get type(): NumberFilterTypes {
     return this.#type;
   }
 
-  transformToNotionFilter() {
+  /**
+   * Transforms filter into a Notion friendly filter.
+   * @return {*}  {NotionPropertyFilter}
+   * @memberof NumberFilter
+   */
+  transformToNotionFilter(): NotionPropertyFilter {
     return {
       property: this.#property,
       number: {

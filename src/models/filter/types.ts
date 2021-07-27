@@ -2,6 +2,38 @@ interface Filter {
   transformToNotionFilter: () => Record<string, any>;
 }
 
+interface NotionPropertyFilter {
+  property: string;
+  checkbox?: {
+    [key: string]: boolean;
+  };
+  date?: {
+    [key: string]: string | boolean | object;
+  };
+  file?: {
+    [key: string]: boolean;
+  };
+  formula?: Record<string, any>;
+  multi_select?: {
+    [key: string]: string | boolean;
+  };
+  number?: {
+    [key: string]: number | boolean;
+  };
+  people?: {
+    [key: string]: number | boolean;
+  };
+  relation?: {
+    [key: string]: string | boolean;
+  };
+  select?: {
+    [key: string]: string | boolean;
+  };
+  text?: {
+    [key: string]: string | boolean;
+  };
+}
+
 type Equals = 'equals';
 type DoesNotEqual = 'does_not_equal';
 type GreaterThan = 'greater_than';
@@ -49,4 +81,5 @@ export {
   NextWeek,
   NextMonth,
   NextYear,
+  NotionPropertyFilter,
 };
