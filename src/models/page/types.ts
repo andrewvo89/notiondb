@@ -19,7 +19,6 @@ interface PageResponse {
 interface PageOptions {
   filter?: Filter;
   sorts?: Sort[];
-  excludeProperties?: string[];
 }
 
 export { PageResponse, PageOptions };

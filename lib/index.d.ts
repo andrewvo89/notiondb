@@ -4,6 +4,6 @@ import NotionUrl from './models/notion/notion-url';
 declare class NotionDB {
     constructor(integrationToken: string);
     getAllDatabases(): Promise<Database[]>;
-    getDatabaseRef(identifer: NotionUrl | NotionId): Promise<Database>;
+    getDatabaseRef(identifier: NotionUrl | NotionId): Promise<Database>;
 }
 export default NotionDB;

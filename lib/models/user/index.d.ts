@@ -5,6 +5,12 @@ declare class User {
     get name(): string;
     get avatar(): string;
     get email(): string | undefined;
+    get object(): {
+        id: string;
+        name: string;
+        avatar: string;
+        email: string | undefined;
+    };
     static getAll(): Promise<User[]>;
     static get(userId: string): Promise<User>;
 }

@@ -16,6 +16,8 @@ class Page {
   #notionProperties: NotionProperty[];
   #properties: Record<string, any>;
   #archived: boolean;
+  #createdTime: globalThis.Date;
+  #lastEditedTime: globalThis.Date;
 
   constructor(
     id: string,
@@ -23,12 +25,16 @@ class Page {
     notionProperties: NotionProperty[],
     properties: Record<string, any>,
     archived: boolean,
+    createdTime: globalThis.Date,
+    lastEditedTime: globalThis.Date,
   ) {
     this.#id = id;
     this.#url = url;
     this.#notionProperties = notionProperties;
     this.#properties = properties;
     this.#archived = archived;
+    this.#createdTime = createdTime;
+    this.#lastEditedTime = lastEditedTime;
   }
 
   get properties() {
@@ -39,12 +45,23 @@ class Page {
     return this.#archived;
   }
 
+  get object() {
+    return {
+      id: this.#id,
+      url: this.#url,
+      archived: this.#archived,
+      properties: this.#properties,
+      createdTime: this.#createdTime,
+      lastEditedTime: this.#lastEditedTime,
+    };
+  }
+
   static async get(
     notionProperties: NotionProperty[],
-    identifer: NotionUrl | NotionId,
+    identifier: NotionUrl | NotionId,
     excludeProperties?: string[],
-  ) {
-    const pageId = identifer.getId();
+  ): Promise<Page> {
+    const pageId = identifier.getId();
     let retries = 0;
     let page: Page | null = null;
     do {
@@ -69,6 +86,8 @@ class Page {
           notionProperties,
           properties,
           pageResponse.archived,
+          new globalThis.Date(pageResponse.created_time),
+          new globalThis.Date(pageResponse.last_edited_time),
         );
       } catch (error) {
         if (retries === MAX_RETRIES) {
@@ -92,13 +111,14 @@ class Page {
     databaseId: string,
     notionProperties: NotionProperty[],
     options: PageOptions,
-  ) {
+    excludeProperties?: string[],
+  ): Promise<Page[]> {
     if (!options.filter && !options.sorts) {
       throw new Error('Must supply at least one Filter or Sort condition.');
     }
     let hasMore: boolean = false;
     let nextCursor: string = '';
-    const pages: Record<string, any>[] = [];
+    const pages: Page[] = [];
     do {
       let retries = 0;
       try {
@@ -140,30 +160,32 @@ class Page {
         if (results.length === 0) {
           continue;
         }
-
-        const pageProperties = results.map((pageResponse: PageResponse) => {
-          const properties = Object.entries(pageResponse.properties).reduce(
-            (prevProperties: Record<string, any>, [propertyName, value]) => {
-              if (options?.excludeProperties?.includes(propertyName)) {
-                return prevProperties;
-              }
-              return {
-                ...prevProperties,
-                [propertyName]: transformFromNotionProperties(value),
-              };
-            },
-            {},
-          );
-          const page = new Page(
-            pageResponse.id,
-            pageResponse.url,
-            notionProperties,
-            properties,
-            pageResponse.archived,
-          );
-          return page.properties;
-        });
-        pages.push(...pageProperties);
+        pages.push(
+          ...results.map((pageResponse: PageResponse) => {
+            const properties = Object.entries(pageResponse.properties).reduce(
+              (prevProperties: Record<string, any>, [propertyName, value]) => {
+                if (excludeProperties?.includes(propertyName)) {
+                  return prevProperties;
+                }
+                return {
+                  ...prevProperties,
+                  [propertyName]: transformFromNotionProperties(value),
+                };
+              },
+              {},
+            );
+            const page = new Page(
+              pageResponse.id,
+              pageResponse.url,
+              notionProperties,
+              properties,
+              pageResponse.archived,
+              new globalThis.Date(pageResponse.created_time),
+              new globalThis.Date(pageResponse.last_edited_time),
+            );
+            return page;
+          }),
+        );
         hasMore = response.data.has_more;
         if (hasMore) {
           nextCursor = response.data.next_cursor;
@@ -190,10 +212,10 @@ class Page {
     databaseId: string,
     notionProperties: NotionProperty[],
     excludeProperties?: string[],
-  ): Promise<Record<string, any>[]> {
+  ): Promise<Page[]> {
     let hasMore: boolean = false;
     let nextCursor: string = '';
-    const pages: Record<string, any>[] = [];
+    const pages: Page[] = [];
     do {
       let retries = 0;
       try {
@@ -209,30 +231,32 @@ class Page {
         if (results.length === 0) {
           continue;
         }
-
-        const pageProperties = results.map((pageResponse: PageResponse) => {
-          const properties = Object.entries(pageResponse.properties).reduce(
-            (prevProperties: Record<string, any>, [propertyName, value]) => {
-              if (excludeProperties?.includes(propertyName)) {
-                return prevProperties;
-              }
-              return {
-                ...prevProperties,
-                [propertyName]: transformFromNotionProperties(value),
-              };
-            },
-            {},
-          );
-          const page = new Page(
-            pageResponse.id,
-            pageResponse.url,
-            notionProperties,
-            properties,
-            pageResponse.archived,
-          );
-          return page.properties;
-        });
-        pages.push(...pageProperties);
+        pages.push(
+          ...results.map((pageResponse: PageResponse) => {
+            const properties = Object.entries(pageResponse.properties).reduce(
+              (prevProperties: Record<string, any>, [propertyName, value]) => {
+                if (excludeProperties?.includes(propertyName)) {
+                  return prevProperties;
+                }
+                return {
+                  ...prevProperties,
+                  [propertyName]: transformFromNotionProperties(value),
+                };
+              },
+              {},
+            );
+            const page = new Page(
+              pageResponse.id,
+              pageResponse.url,
+              notionProperties,
+              properties,
+              pageResponse.archived,
+              new globalThis.Date(pageResponse.created_time),
+              new globalThis.Date(pageResponse.last_edited_time),
+            );
+            return page;
+          }),
+        );
         hasMore = response.data.has_more;
         if (hasMore) {
           nextCursor = response.data.next_cursor;
@@ -296,6 +320,8 @@ class Page {
           notionProperties,
           properties,
           pageResponse.archived,
+          new globalThis.Date(pageResponse.created_time),
+          new globalThis.Date(pageResponse.last_edited_time),
         );
       } catch (error) {
         if (!error.isAxiosError) {
@@ -319,80 +345,115 @@ class Page {
   }
 
   async update(data: Record<string, any>): Promise<Page> {
-    let retries = 0;
-    const propertyNames = Object.keys(data);
-    const { valid, errors } = validatePropertiesExist(
-      propertyNames,
-      this.#notionProperties,
-    );
-    if (!valid) {
-      throw new Error(errors.join(', '));
-    }
-
-    let page: Page | null = null;
-    do {
-      try {
-        const response = await axios.patch(`/pages/${this.#id}`, {
-          properties: transformToNotionProperties(this.#notionProperties, data),
-        });
-        const pageResponse = response.data as PageResponse;
-        const properties = Object.entries(pageResponse.properties).reduce(
-          (prevProperties: Record<string, any>, [propertyName, value]) => {
-            return {
-              ...prevProperties,
-              [propertyName]: transformFromNotionProperties(value),
-            };
-          },
-          {},
-        );
-        page = new Page(
-          pageResponse.id,
-          pageResponse.url,
-          this.#notionProperties,
-          properties,
-          pageResponse.archived,
-        );
-      } catch (error) {
-        if (!error.isAxiosError) {
-          throw new Error(error);
-        }
-        if (retries === MAX_RETRIES) {
-          break;
-        }
-        await new Promise((resolve) =>
-          globalThis.setTimeout(() => {
-            retries++;
-            resolve(null);
-          }, BACK_OFF_TIME),
-        );
-      }
-    } while (!page);
-    if (!page) {
-      throw new Error(`Page ${this.#id} failed to update.`);
-    }
-    return page;
+    return update(this.#notionProperties, this.#id, data);
   }
 
-  async restore(): Promise<Page> {
-    if (!this.#archived) {
-      throw new Error(`Page ${this.#id} is already active.`);
-    }
-    return await setArchived(this.#id, this.#notionProperties, false);
+  static update(
+    notionProperties: NotionProperty[],
+    identifier: NotionUrl | NotionId,
+    data: Record<string, any>,
+  ): Promise<Page> {
+    const pageId = identifier.getId();
+    return update(notionProperties, pageId, data);
   }
 
   async delete(): Promise<Page> {
     if (this.#archived) {
       throw new Error(`Page ${this.#id} has already been deleted.`);
     }
-    return await setArchived(this.#id, this.#notionProperties, true);
+    return await setArchived(this.#notionProperties, this.#id, true);
+  }
+
+  static delete(
+    notionProperties: NotionProperty[],
+    identifier: NotionUrl | NotionId,
+  ): Promise<Page> {
+    const pageId = identifier.getId();
+    return setArchived(notionProperties, pageId, true);
+  }
+
+  async restore(): Promise<Page> {
+    if (!this.#archived) {
+      throw new Error(`Page ${this.#id} is already active.`);
+    }
+    return await setArchived(this.#notionProperties, this.#id, false);
+  }
+
+  static async restore(
+    notionProperties: NotionProperty[],
+    identifier: NotionUrl | NotionId,
+  ): Promise<Page> {
+    const pageId = identifier.getId();
+    return setArchived(notionProperties, pageId, false);
   }
 }
 
 export default Page;
 
-async function setArchived(
-  pageId: string,
+async function update(
   notionProperties: NotionProperty[],
+  pageId: string,
+  data: Record<string, any>,
+): Promise<Page> {
+  let retries = 0;
+  const propertyNames = Object.keys(data);
+  const { valid, errors } = validatePropertiesExist(
+    propertyNames,
+    notionProperties,
+  );
+  if (!valid) {
+    throw new Error(errors.join(', '));
+  }
+
+  let page: Page | null = null;
+  do {
+    try {
+      const response = await axios.patch(`/pages/${pageId}`, {
+        properties: transformToNotionProperties(notionProperties, data),
+      });
+      const pageResponse = response.data as PageResponse;
+      const properties = Object.entries(pageResponse.properties).reduce(
+        (prevProperties: Record<string, any>, [propertyName, value]) => {
+          return {
+            ...prevProperties,
+            [propertyName]: transformFromNotionProperties(value),
+          };
+        },
+        {},
+      );
+      page = new Page(
+        pageResponse.id,
+        pageResponse.url,
+        notionProperties,
+        properties,
+        pageResponse.archived,
+        new globalThis.Date(pageResponse.created_time),
+        new globalThis.Date(pageResponse.last_edited_time),
+      );
+    } catch (error) {
+      if (!error.isAxiosError) {
+        throw new Error(error);
+      }
+      if (retries === MAX_RETRIES) {
+        break;
+      }
+      await new Promise((resolve) =>
+        globalThis.setTimeout(() => {
+          retries++;
+          resolve(null);
+        }, BACK_OFF_TIME),
+      );
+    }
+  } while (!page);
+  if (!page) {
+    throw new Error(`Page ${pageId} failed to update.`);
+  }
+  return page;
+}
+
+async function setArchived(
+  notionProperties: NotionProperty[],
+  pageId: string,
   archived: boolean,
 ) {
   let retries = 0;
@@ -418,6 +479,8 @@ async function setArchived(
         notionProperties,
         properties,
         pageResponse.archived,
+        new globalThis.Date(pageResponse.created_time),
+        new globalThis.Date(pageResponse.last_edited_time),
       );
     } catch (error) {
       if (retries === MAX_RETRIES) {

@@ -30,14 +30,20 @@ class Database {
 
   get pages() {
     return {
-      get: (identifer: NotionUrl | NotionId, excludeProperties?: string[]) =>
-        Page.get(this.#properties, identifer, excludeProperties),
-      getMany: (options: PageOptions) =>
-        Page.getMany(this.#id, this.#properties, options),
+      get: (identifier: NotionUrl | NotionId, excludeProperties?: string[]) =>
+        Page.get(this.#properties, identifier, excludeProperties),
+      getMany: (options: PageOptions, excludeProperties?: string[]) =>
+        Page.getMany(this.#id, this.#properties, options, excludeProperties),
       getAll: (excludeProperties?: string[]) =>
         Page.getAll(this.#id, this.#properties, excludeProperties),
       create: (data: Record<string, any>) =>
         Page.create(this.#id, this.#properties, data),
+      update: (identifier: NotionUrl | NotionId, data: Record<string, any>) =>
+        Page.update(this.#properties, identifier, data),
+      delete: (identifier: NotionUrl | NotionId) =>
+        Page.delete(this.#properties, identifier),
+      restore: (identifier: NotionUrl | NotionId) =>
+        Page.restore(this.#properties, identifier),
     };
   }
 

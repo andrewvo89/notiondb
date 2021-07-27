@@ -30,6 +30,15 @@ class User {
     return this.#email;
   }
 
+  get object() {
+    return {
+      id: this.#id,
+      name: this.#name,
+      avatar: this.#avatar,
+      email: this.#email,
+    };
+  }
+
   static async getAll(): Promise<User[]> {
     let hasMore: boolean = false;
     let nextCursor: string = '';
@@ -42,12 +51,12 @@ class User {
       const results = response.data.results as UserResponse[];
       users.push(
         ...results.map((result) =>
-          result.person
+          result.type === 'person'
             ? new User(
                 result.id,
                 result.name,
                 result.avatar_url,
-                result.person.email,
+                result.person?.email,
               )
             : new User(result.id, result.name, result.avatar_url),
         ),

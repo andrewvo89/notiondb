@@ -1,11 +1,9 @@
 import axios, { BACK_OFF_TIME, MAX_RETRIES } from './utils/api';
 import Database from './models/database';
-import dotenv from 'dotenv';
 import NotionId from './models/notion/notion-id';
 import NotionUrl from './models/notion/notion-url';
 import { DatabaseResponse } from './models/database/types';
 import { NotionProperty } from './models/notion/types';
-import { NotionUrlTypes } from './models/notion/notion-url/types';
 
 class NotionDB {
   constructor(integrationToken: string) {
@@ -65,8 +63,8 @@ class NotionDB {
     return databases;
   }
 
-  async getDatabaseRef(identifer: NotionUrl | NotionId): Promise<Database> {
-    const databaseId = identifer.getId();
+  async getDatabaseRef(identifier: NotionUrl | NotionId): Promise<Database> {
+    const databaseId = identifier.getId();
     let retries = 0;
     let database: Database | null = null;
     do {
@@ -107,16 +105,3 @@ class NotionDB {
 }
 
 export default NotionDB;
-
-const run = async () => {
-  dotenv.config();
-  const notionDB = new NotionDB(process.env.NOTION_API_KEY as string);
-  const database = await notionDB.getDatabaseRef(
-    new NotionUrl(process.env.NOTION_DB_URL as string, NotionUrlTypes.DATABASE),
-  );
-  const page = await database.pages.get(
-    new NotionUrl(process.env.NOTION_PAGE_URL as string, NotionUrlTypes.PAGE),
-  );
-};
-
-run();
