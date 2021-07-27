@@ -31,6 +31,10 @@ export interface RichTextObject {
   href?: string;
   annotations: Annotations;
   type: 'text' | 'mention' | 'equation';
+  text: {
+    content: string;
+    link: string | null;
+  };
 }
 
 export interface NotionProperty {

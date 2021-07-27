@@ -110,8 +110,8 @@ class Page {
     do {
       try {
         const response = await axios.get(`/pages/${pageId}`);
-        const pageResponse = response.data as PageResponse;
-        const properties = Object.entries(pageResponse.properties).reduce(
+        const result = response.data as PageResponse;
+        const properties = Object.entries(result.properties).reduce(
           (prevProperties: Record<string, any>, [propertyName, value]) => {
             if (excludeProperties?.includes(propertyName)) {
               return prevProperties;
@@ -124,13 +124,13 @@ class Page {
           {},
         );
         page = new Page(
-          pageResponse.id,
-          pageResponse.url,
+          result.id,
+          result.url,
           notionProperties,
           properties,
-          pageResponse.archived,
-          new globalThis.Date(pageResponse.created_time),
-          new globalThis.Date(pageResponse.last_edited_time),
+          result.archived,
+          new globalThis.Date(result.created_time),
+          new globalThis.Date(result.last_edited_time),
         );
       } catch (error) {
         if (retries === MAX_RETRIES) {
@@ -214,8 +214,8 @@ class Page {
           continue;
         }
         pages.push(
-          ...results.map((pageResponse: PageResponse) => {
-            const properties = Object.entries(pageResponse.properties).reduce(
+          ...results.map((result: PageResponse) => {
+            const properties = Object.entries(result.properties).reduce(
               (prevProperties: Record<string, any>, [propertyName, value]) => {
                 if (excludeProperties?.includes(propertyName)) {
                   return prevProperties;
@@ -228,13 +228,13 @@ class Page {
               {},
             );
             const page = new Page(
-              pageResponse.id,
-              pageResponse.url,
+              result.id,
+              result.url,
               notionProperties,
               properties,
-              pageResponse.archived,
-              new globalThis.Date(pageResponse.created_time),
-              new globalThis.Date(pageResponse.last_edited_time),
+              result.archived,
+              new globalThis.Date(result.created_time),
+              new globalThis.Date(result.last_edited_time),
             );
             return page;
           }),
@@ -294,8 +294,8 @@ class Page {
           continue;
         }
         pages.push(
-          ...results.map((pageResponse: PageResponse) => {
-            const properties = Object.entries(pageResponse.properties).reduce(
+          ...results.map((result: PageResponse) => {
+            const properties = Object.entries(result.properties).reduce(
               (prevProperties: Record<string, any>, [propertyName, value]) => {
                 if (excludeProperties?.includes(propertyName)) {
                   return prevProperties;
@@ -308,13 +308,13 @@ class Page {
               {},
             );
             const page = new Page(
-              pageResponse.id,
-              pageResponse.url,
+              result.id,
+              result.url,
               notionProperties,
               properties,
-              pageResponse.archived,
-              new globalThis.Date(pageResponse.created_time),
-              new globalThis.Date(pageResponse.last_edited_time),
+              result.archived,
+              new globalThis.Date(result.created_time),
+              new globalThis.Date(result.last_edited_time),
             );
             return page;
           }),
@@ -375,8 +375,8 @@ class Page {
           },
           properties: transformToNotionProperties(notionProperties, data),
         });
-        const pageResponse = response.data as PageResponse;
-        const properties = Object.entries(pageResponse.properties).reduce(
+        const result = response.data as PageResponse;
+        const properties = Object.entries(result.properties).reduce(
           (prevProperties: Record<string, any>, [propertyName, value]) => {
             return {
               ...prevProperties,
@@ -386,13 +386,13 @@ class Page {
           {},
         );
         page = new Page(
-          pageResponse.id,
-          pageResponse.url,
+          result.id,
+          result.url,
           notionProperties,
           properties,
-          pageResponse.archived,
-          new globalThis.Date(pageResponse.created_time),
-          new globalThis.Date(pageResponse.last_edited_time),
+          result.archived,
+          new globalThis.Date(result.created_time),
+          new globalThis.Date(result.last_edited_time),
         );
       } catch (error) {
         if (!error.isAxiosError) {
@@ -530,8 +530,8 @@ async function update(
       const response = await axios.patch(`/pages/${pageId}`, {
         properties: transformToNotionProperties(notionProperties, data),
       });
-      const pageResponse = response.data as PageResponse;
-      const properties = Object.entries(pageResponse.properties).reduce(
+      const result = response.data as PageResponse;
+      const properties = Object.entries(result.properties).reduce(
         (prevProperties: Record<string, any>, [propertyName, value]) => {
           return {
             ...prevProperties,
@@ -541,13 +541,13 @@ async function update(
         {},
       );
       page = new Page(
-        pageResponse.id,
-        pageResponse.url,
+        result.id,
+        result.url,
         notionProperties,
         properties,
-        pageResponse.archived,
-        new globalThis.Date(pageResponse.created_time),
-        new globalThis.Date(pageResponse.last_edited_time),
+        result.archived,
+        new globalThis.Date(result.created_time),
+        new globalThis.Date(result.last_edited_time),
       );
     } catch (error) {
       if (!error.isAxiosError) {
@@ -589,8 +589,8 @@ async function setArchived(
       const response = await axios.patch(`/pages/${pageId}`, {
         archived,
       });
-      const pageResponse = response.data as PageResponse;
-      const properties = Object.entries(pageResponse.properties).reduce(
+      const result = response.data as PageResponse;
+      const properties = Object.entries(result.properties).reduce(
         (prevProperties: Record<string, any>, [propertyName, value]) => {
           return {
             ...prevProperties,
@@ -600,13 +600,13 @@ async function setArchived(
         {},
       );
       page = new Page(
-        pageResponse.id,
-        pageResponse.url,
+        result.id,
+        result.url,
         notionProperties,
         properties,
-        pageResponse.archived,
-        new globalThis.Date(pageResponse.created_time),
-        new globalThis.Date(pageResponse.last_edited_time),
+        result.archived,
+        new globalThis.Date(result.created_time),
+        new globalThis.Date(result.last_edited_time),
       );
     } catch (error) {
       if (retries === MAX_RETRIES) {

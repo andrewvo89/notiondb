@@ -8,8 +8,8 @@ import { UserObject, UserResponse } from './types';
 class User {
   #id: string;
   #name: string;
-  #avatar: string;
-  #email?: string;
+  #avatar: string | null;
+  #email: string | null;
 
   /**
    * Creates an instance of User.
@@ -19,11 +19,11 @@ class User {
    * @param {string} [email]
    * @memberof User
    */
-  constructor(id: string, name: string, avatar: string, email?: string) {
+  constructor(id: string, name: string, avatar: string | null, email?: string) {
     this.#id = id;
     this.#name = name;
     this.#avatar = avatar;
-    this.#email = email;
+    this.#email = email ?? null;
   }
 
   /**
@@ -52,17 +52,17 @@ class User {
    * @type {string}
    * @memberof User
    */
-  get avatar(): string {
+  get avatar(): string | null {
     return this.#avatar;
   }
 
   /**
    * Gets the User's Email if it is avaiable.
    * @readonly
-   * @type {(string | undefined)}
+   * @type {(string | null)}
    * @memberof User
    */
-  get email(): string | undefined {
+  get email(): string | null {
     return this.#email;
   }
 

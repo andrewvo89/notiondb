@@ -14,22 +14,10 @@ import TextFilter from '../../models/filter/text-filter';
 import { Filter } from '../../models/filter/types';
 import { NotionProperty, NotionPropertyData } from '../../models/notion/types';
 import { NotionUrlTypes } from '../../models/notion/notion-url/types';
-import { PropertyData } from '../../models/property-data/types';
 import { Sort } from '../../models/sort/types';
 import { validate as uuidValidate } from 'uuid';
-import {
-  Checkbox,
-  Date,
-  Email,
-  MultiSelect,
-  Number,
-  People,
-  PhoneNumber,
-  RichText,
-  Select,
-  Title,
-  URL,
-} from '../../models/property-data';
+import Property from '../../models/property';
+import { PropertyInterface } from '../../models/property/types';
 
 /**
  * Parses a Notion URL and returns the Notion ID.
@@ -56,9 +44,12 @@ function getIdFromUrl(url: string, type: NotionUrlTypes): string {
  * @return {*}  {string}
  */
 function getIdFromId(id: string): string {
-  const uuidv4 = transformStringToUUID(id);
-  if (!uuidValidate(uuidv4)) {
-    throw new Error('ID supplied was not valid.');
+  if (!uuidValidate(id)) {
+    const uuidv4 = transformStringToUUID(id);
+    if (!uuidValidate(uuidv4)) {
+      throw new Error('ID supplied was not valid.');
+    }
+    return uuidv4;
   }
   return id;
 }
@@ -211,38 +202,38 @@ function transformToNotionProperties(
       if (!property) {
         return notionProperties;
       }
-      let propertyData: PropertyData;
+      let propertyData: PropertyInterface;
       switch (property.type) {
         case 'title':
-          propertyData = new Title(value);
+          propertyData = new Property.Title(value);
           break;
         case 'rich_text':
-          propertyData = new RichText(value);
+          propertyData = new Property.RichText(value);
           break;
         case 'number':
           // tslint:disable-next-line: no-construct
-          propertyData = new Number(value);
+          propertyData = new Property.Number(value);
           break;
         case 'select':
-          propertyData = new Select(value);
+          propertyData = new Property.Select(value);
           break;
         case 'multi_select':
-          propertyData = new MultiSelect(value);
+          propertyData = new Property.MultiSelect(value);
           break;
         case 'date':
-          propertyData = new Date(value);
+          propertyData = new Property.Date(value);
           break;
         case 'checkbox':
-          propertyData = new Checkbox(value);
+          propertyData = new Property.Checkbox(value);
           break;
         case 'url':
-          propertyData = new URL(value);
+          propertyData = new Property.URL(value);
           break;
         case 'email':
-          propertyData = new Email(value);
+          propertyData = new Property.Email(value);
           break;
         case 'phone_number':
-          propertyData = new PhoneNumber(value);
+          propertyData = new Property.PhoneNumber(value);
           break;
         default:
           return notionProperties;
@@ -265,27 +256,27 @@ function transformFromNotionProperties(propertyData: NotionPropertyData): any {
   const data = propertyData[propertyData.type];
   switch (propertyData.type) {
     case 'title':
-      return Title.getValue({ title: data });
+      return Property.Title.getValue({ title: data });
     case 'rich_text':
-      return RichText.getValue({ rich_text: data });
+      return Property.RichText.getValue({ rich_text: data });
     case 'number':
-      return Number.getValue({ number: data });
+      return Property.Number.getValue({ number: data });
     case 'select':
-      return Select.getValue({ select: data });
+      return Property.Select.getValue({ select: data });
     case 'multi_select':
-      return MultiSelect.getValue({ multi_select: data });
+      return Property.MultiSelect.getValue({ multi_select: data });
     case 'date':
-      return Date.getValue({ date: data });
+      return Property.Date.getValue({ date: data });
     case 'checkbox':
-      return Checkbox.getValue({ checkbox: data });
+      return Property.Checkbox.getValue({ checkbox: data });
     case 'url':
-      return URL.getValue({ url: data });
+      return Property.URL.getValue({ url: data });
     case 'email':
-      return Email.getValue({ email: data });
+      return Property.Email.getValue({ email: data });
     case 'phone_number':
-      return PhoneNumber.getValue({ phone_number: data });
+      return Property.PhoneNumber.getValue({ phone_number: data });
     case 'people':
-      return People.getValue({ people: data });
+      return Property.People.getValue({ people: data });
     case 'formula': {
       const type = propertyData.formula.type;
       return transformFromNotionProperties({

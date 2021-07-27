@@ -5,7 +5,7 @@ interface DatabaseResponse {
   id: string;
   created_time: string;
   last_edited_time: string;
-  title: RichTextObject;
+  title: RichTextObject[];
   properties: Record<string, NotionProperty>;
   parent: {
     type: string;
@@ -13,4 +13,12 @@ interface DatabaseResponse {
   };
 }
 
-export { DatabaseResponse };
+interface DatabaseObject {
+  id: string;
+  title: string;
+  properties: NotionProperty[];
+  createdTime: globalThis.Date;
+  lastEditedTime: globalThis.Date;
+}
+
+export { DatabaseResponse, DatabaseObject };

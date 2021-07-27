@@ -11,7 +11,7 @@ class NotionId {
   }
 
   /**
-   * Validates the ID.
+   * Validates the ID and converts to UUIDv4.
    * @return {*}  {string}
    * @memberof NotionId
    */

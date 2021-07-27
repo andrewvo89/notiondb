@@ -20,7 +20,7 @@ class NumberFilter implements Filter {
    */
   constructor(
     property: string,
-    type: ,
+    type: NumberFilterTypes,
     value: number | boolean,
   ) {
     this.#property = property;
