@@ -13,17 +13,20 @@ import {
 class Page {
   #id: string;
   #url: string;
+  #notionProperties: NotionProperty[];
   #properties: Record<string, any>;
   #archived: boolean;
 
   constructor(
     id: string,
     url: string,
+    notionProperties: NotionProperty[],
     properties: Record<string, any>,
     archived: boolean,
   ) {
     this.#id = id;
     this.#url = url;
+    this.#notionProperties = notionProperties;
     this.#properties = properties;
     this.#archived = archived;
   }
@@ -37,6 +40,7 @@ class Page {
   }
 
   static async get(
+    notionProperties: NotionProperty[],
     identifer: NotionUrl | NotionId,
     excludeProperties?: string[],
   ) {
@@ -62,6 +66,7 @@ class Page {
         page = new Page(
           pageResponse.id,
           pageResponse.url,
+          notionProperties,
           properties,
           pageResponse.archived,
         );
@@ -152,6 +157,7 @@ class Page {
           const page = new Page(
             pageResponse.id,
             pageResponse.url,
+            notionProperties,
             properties,
             pageResponse.archived,
           );
@@ -182,6 +188,7 @@ class Page {
 
   static async getAll(
     databaseId: string,
+    notionProperties: NotionProperty[],
     excludeProperties?: string[],
   ): Promise<Record<string, any>[]> {
     let hasMore: boolean = false;
@@ -219,6 +226,7 @@ class Page {
           const page = new Page(
             pageResponse.id,
             pageResponse.url,
+            notionProperties,
             properties,
             pageResponse.archived,
           );
@@ -285,6 +293,7 @@ class Page {
         page = new Page(
           pageResponse.id,
           pageResponse.url,
+          notionProperties,
           properties,
           pageResponse.archived,
         );
@@ -309,26 +318,83 @@ class Page {
     return page;
   }
 
-  // update() {}
+  async update(data: Record<string, any>): Promise<Page> {
+    let retries = 0;
+    const propertyNames = Object.keys(data);
+    const { valid, errors } = validatePropertiesExist(
+      propertyNames,
+      this.#notionProperties,
+    );
+    if (!valid) {
+      throw new Error(errors.join(', '));
+    }
+
+    let page: Page | null = null;
+    do {
+      try {
+        const response = await axios.patch(`/pages/${this.#id}`, {
+          properties: transformToNotionProperties(this.#notionProperties, data),
+        });
+        const pageResponse = response.data as PageResponse;
+        const properties = Object.entries(pageResponse.properties).reduce(
+          (prevProperties: Record<string, any>, [propertyName, value]) => {
+            return {
+              ...prevProperties,
+              [propertyName]: transformFromNotionProperties(value),
+            };
+          },
+          {},
+        );
+        page = new Page(
+          pageResponse.id,
+          pageResponse.url,
+          this.#notionProperties,
+          properties,
+          pageResponse.archived,
+        );
+      } catch (error) {
+        if (!error.isAxiosError) {
+          throw new Error(error);
+        }
+        if (retries === MAX_RETRIES) {
+          break;
+        }
+        await new Promise((resolve) =>
+          globalThis.setTimeout(() => {
+            retries++;
+            resolve(null);
+          }, BACK_OFF_TIME),
+        );
+      }
+    } while (!page);
+    if (!page) {
+      throw new Error(`Page ${this.#id} failed to update.`);
+    }
+    return page;
+  }
 
   async restore(): Promise<Page> {
     if (!this.#archived) {
       throw new Error(`Page ${this.#id} is already active.`);
     }
-    return await setArchived(this.#id, false);
+    return await setArchived(this.#id, this.#notionProperties, false);
   }
 
   async delete(): Promise<Page> {
     if (this.#archived) {
       throw new Error(`Page ${this.#id} has already been deleted.`);
     }
-    return await setArchived(this.#id, true);
+    return await setArchived(this.#id, this.#notionProperties, true);
   }
 }
 
 export default Page;
 
-async function setArchived(pageId: string, archived: boolean) {
+async function setArchived(
+  pageId: string,
+  notionProperties: NotionProperty[],
+  archived: boolean,
+) {
   let retries = 0;
   let page: Page | null = null;
   do {
@@ -349,6 +415,7 @@ async function setArchived(pageId: string, archived: boolean) {
       page = new Page(
         pageResponse.id,
         pageResponse.url,
+        notionProperties,
         properties,
         pageResponse.archived,
       );

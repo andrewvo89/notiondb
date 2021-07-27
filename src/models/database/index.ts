@@ -1,3 +1,5 @@
+import NotionId from '../notion/notion-id';
+import NotionUrl from '../notion/notion-url';
 import Page from '../page';
 import { NotionProperty } from '../notion/types';
 import { PageOptions } from '../page/types';
@@ -28,11 +30,12 @@ class Database {
 
   get pages() {
     return {
-      get: Page.get,
+      get: (identifer: NotionUrl | NotionId, excludeProperties?: string[]) =>
+        Page.get(this.#properties, identifer, excludeProperties),
       getMany: (options: PageOptions) =>
         Page.getMany(this.#id, this.#properties, options),
       getAll: (excludeProperties?: string[]) =>
-        Page.getAll(this.#id, excludeProperties),
+        Page.getAll(this.#id, this.#properties, excludeProperties),
       create: (data: Record<string, any>) =>
         Page.create(this.#id, this.#properties, data),
     };

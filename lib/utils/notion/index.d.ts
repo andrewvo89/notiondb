@@ -1,6 +1,6 @@
 import { Filter } from '../../models/filter/types';
-import { NotionUrlTypes } from '../../models/notion/notion-url/types';
 import { NotionProperty, NotionPropertyData } from '../../models/notion/types';
+import { NotionUrlTypes } from '../../models/notion/notion-url/types';
 import { Sort } from '../../models/sort/types';
 declare function getIdFromUrl(url: string, type: NotionUrlTypes): string;
 declare function getIdFromId(id: string): string;

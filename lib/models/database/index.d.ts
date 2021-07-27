@@ -1,5 +1,7 @@
-import { NotionProperty } from '../notion/types';
+import NotionId from '../notion/notion-id';
+import NotionUrl from '../notion/notion-url';
 import Page from '../page';
+import { NotionProperty } from '../notion/types';
 import { PageOptions } from '../page/types';
 import { User } from '../user';
 declare class Database {
@@ -9,7 +11,7 @@ declare class Database {
     get title(): string;
     get properties(): NotionProperty[];
     get pages(): {
-        get: typeof Page.get;
+        get: (identifer: NotionUrl | NotionId, excludeProperties?: string[] | undefined) => Promise<Page>;
         getMany: (options: PageOptions) => Promise<Record<string, any>[]>;
         getAll: (excludeProperties?: string[] | undefined) => Promise<Record<string, any>[]>;
         create: (data: Record<string, any>) => Promise<Page>;
