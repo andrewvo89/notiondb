@@ -21,7 +21,7 @@ class PropertySort implements Sort {
   }
 
   /**
-   * Get the PropertyAndTimestampSort sort property.
+   * Get the PropertySort sort property.
    * @readonly
    * @type {string}
    * @memberof PropertySort

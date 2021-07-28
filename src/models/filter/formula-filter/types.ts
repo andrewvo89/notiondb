@@ -1,11 +1,7 @@
-import CheckboxFilter from '../checkbox-filter';
-import DateFilter from '../date-filter';
-import NumberFilter from '../number-filter';
-import TextFilter from '../text-filter';
-import { CheckboxFilterTypes } from '../checkbox-filter/types';
-import { DateFilterTypes } from '../date-filter/types';
-import { NumberFilterTypes } from '../number-filter/types';
-import { TextFilterTypes } from '../text-filter/types';
+import { CheckboxFilter, CheckboxFilterTypes } from '../checkbox-filter';
+import { DateFilter, DateFilterTypes } from '../date-filter';
+import { NumberFilter, NumberFilterTypes } from '../number-filter';
+import { TextFilter, TextFilterTypes } from '../text-filter';
 
 type FormulaFilterTypes =
   | TextFilterTypes

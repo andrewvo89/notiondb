@@ -1,4 +1,4 @@
-import { PropertyAndTimestampSort, PropertySort } from '../../models/sort';
+import { PropertySort } from '../../models/sort';
 import { RelationFilter, SelectFilter } from '../../models/filter';
 import { Sort } from '../../models/sort';
 import { validate as uuidValidate } from 'uuid';
@@ -165,10 +165,7 @@ function validateSorts(
  */
 function getSortPropertyNames(sorts: Sort[]): string[] {
   return sorts.reduce((prevPropertyNames: string[], sort: Sort) => {
-    if (
-      sort instanceof PropertySort ||
-      sort instanceof PropertyAndTimestampSort
-    ) {
+    if (sort instanceof PropertySort) {
       return [...prevPropertyNames, sort.property];
     }
     return prevPropertyNames;

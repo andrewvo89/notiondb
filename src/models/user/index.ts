@@ -1,5 +1,6 @@
 import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { UserObject, UserResponse } from '.';
+import { NotionId } from '../notion';
 
 /**
  * Class representing a Notion User.
@@ -82,13 +83,14 @@ class User {
   }
 
   /**
-   * Get the Page using the User's ID.
+   * Get a User using the User's ID.
    * @static
    * @param {string} userId
    * @return {*}  {Promise<User>}
    * @memberof User
    */
-  static async get(userId: string): Promise<User> {
+  static async get(identifier: NotionId): Promise<User> {
+    const userId = identifier.getId();
     let retries = 0;
     let user: User | null = null;
     do {
