@@ -1,15 +1,5 @@
-import axios, { BACK_OFF_TIME, MAX_RETRIES } from './utils/api';
-import Database from './models/database';
-import NotionId from './models/notion/notion-id';
-import NotionUrl from './models/notion/notion-url';
-import { DatabaseResponse } from './models/database/types';
-import { NotionProperty } from './models/notion/types';
-import { NotionUrlTypes } from './models/notion/notion-url/types';
-import SchemaObject from './models/property-schema/schema-object';
-import Number from './models/property/number';
-import PropertySchema from './models/property-schema';
-import Property from './models/property';
-import Checkbox from './models/property/checkbox';
+import { axios } from './utils/api';
+import { Database } from './models';
 
 /**
  * Class representing a NotionDB.
@@ -34,4 +24,4 @@ class NotionDB {
   }
 }
 
-export default NotionDB;
+export { NotionDB };

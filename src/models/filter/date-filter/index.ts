@@ -1,5 +1,5 @@
-import { DateFilterTypes } from './types';
-import { Filter, NotionPropertyFilter } from '../types';
+import { DateFilterTypes } from '.';
+import { Filter, NotionPropertyFilter } from '..';
 
 /**
  * Class representing a DateFilter.
@@ -63,4 +63,5 @@ class DateFilter implements Filter {
   }
 }
 
-export default DateFilter;
+export { DateFilter };
+export * from './types';

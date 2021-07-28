@@ -1,13 +1,8 @@
 import dayjs from 'dayjs';
 import dayjsTimezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import {
-  DateFriendlyValue,
-  DateNotionValue,
-  DateOptions,
-  DatePropertyObject,
-} from './types';
-import { PropertyInterface } from '../types';
+import { DateFriendlyValue, DateNotionValue, DateOptions } from '.';
+import { PropertyInterface } from '..';
 dayjs.extend(utc);
 dayjs.extend(dayjsTimezone);
 
@@ -103,4 +98,5 @@ class Date implements PropertyInterface {
   }
 }
 
-export default Date;
+export { Date };
+export * from './types';

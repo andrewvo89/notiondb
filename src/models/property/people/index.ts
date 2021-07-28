@@ -1,9 +1,5 @@
-import {
-  PeopleFriendlyValue,
-  PeopleNotionValue,
-  PeoplePropertyObject,
-} from './types';
-import { PropertyInterface } from '../types';
+import { PeopleFriendlyValue, PeopleNotionValue } from '.';
+import { PropertyInterface } from '..';
 
 /**
  * Class representing a People Notion type.
@@ -58,4 +54,5 @@ class People implements PropertyInterface {
   }
 }
 
-export default People;
+export { People };
+export * from './types';

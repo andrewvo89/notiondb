@@ -1,5 +1,5 @@
 import { getIdFromUrl } from '../../../utils/notion';
-import { NotionUrlTypes } from './types';
+import { NotionUrlTypes } from '.';
 
 /**
  * Class representing a Notion URL.
@@ -33,4 +33,5 @@ class NotionUrl {
   }
 }
 
-export default NotionUrl;
+export { NotionUrl };
+export * from './types';

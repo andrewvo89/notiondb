@@ -1,5 +1,5 @@
-import { FileFilterTypes } from './types';
-import { Filter, NotionPropertyFilter } from '../types';
+import { FileFilterTypes } from '.';
+import { Filter, NotionPropertyFilter } from '..';
 
 /**
  * Class representing a FileFilter.
@@ -49,4 +49,5 @@ class FileFilter implements Filter {
   }
 }
 
-export default FileFilter;
+export { FileFilter };
+export * from './types';

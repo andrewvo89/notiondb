@@ -1,5 +1,5 @@
-import { Filter, NotionPropertyFilter } from '../types';
-import { RelationFilterTypes } from './types';
+import { Filter, NotionPropertyFilter } from '..';
+import { RelationFilterTypes } from '.';
 
 /**
  * Class representing a RelationFilter.
@@ -53,4 +53,5 @@ class RelationFilter implements Filter {
   }
 }
 
-export default RelationFilter;
+export { RelationFilter };
+export * from './types';

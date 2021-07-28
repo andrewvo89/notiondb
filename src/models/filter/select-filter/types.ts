@@ -1,4 +1,4 @@
-import { DoesNotEqual, Equals, IsEmpty, IsNotEmpty } from '../types';
+import { DoesNotEqual, Equals, IsEmpty, IsNotEmpty } from '..';
 
 type SelectFilterTypes = Equals | DoesNotEqual | IsEmpty | IsNotEmpty;
 

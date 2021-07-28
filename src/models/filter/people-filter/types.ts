@@ -1,4 +1,4 @@
-import { Contains, DoesNotContain, IsEmpty, IsNotEmpty } from '../types';
+import { Contains, DoesNotContain, IsEmpty, IsNotEmpty } from '..';
 
 type PeopleFilterTypes = Contains | DoesNotContain | IsEmpty | IsNotEmpty;
 

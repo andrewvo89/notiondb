@@ -1,5 +1,5 @@
-import { Filter, NotionPropertyFilter } from '../types';
-import { SelectFilterTypes } from './types';
+import { Filter, NotionPropertyFilter } from '..';
+import { SelectFilterTypes } from '.';
 
 /**
  * Class representing a SelectFilter.
@@ -53,4 +53,5 @@ class SelectFilter implements Filter {
   }
 }
 
-export default SelectFilter;
+export { SelectFilter };
+export * from './types';

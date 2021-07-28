@@ -1,5 +1,5 @@
-import { PropertyInterface } from '../types';
-import { URLNotionValue, URLPropertyObject } from './types';
+import { PropertyInterface } from '..';
+import { URLNotionValue } from '.';
 
 /**
  * Class representing a URL Notion type.
@@ -42,4 +42,5 @@ class URL implements PropertyInterface {
   }
 }
 
-export default URL;
+export { URL };
+export * from './types';

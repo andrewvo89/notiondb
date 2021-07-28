@@ -1,5 +1,5 @@
-import axios, { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
-import { UserObject, UserResponse } from './types';
+import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
+import { UserObject, UserResponse } from '.';
 
 /**
  * Class representing a Notion User.
@@ -160,4 +160,5 @@ class User {
   }
 }
 
-export default User;
+export { User };
+export * from './types';

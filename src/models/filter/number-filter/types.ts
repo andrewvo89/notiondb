@@ -7,7 +7,7 @@ import {
   IsNotEmpty,
   LessThan,
   LessThanOrEqualTo,
-} from '../types';
+} from '..';
 
 type NumberFilterTypes =
   | Equals

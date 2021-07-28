@@ -1,5 +1,5 @@
-import { MultiSelectNotionValue, MultiSelectPropertyObject } from './types';
-import { PropertyInterface } from '../types';
+import { MultiSelectNotionValue } from '.';
+import { PropertyInterface } from '..';
 
 /**
  * Class representing a MultiSelect Notion type.
@@ -42,4 +42,5 @@ class MultiSelect implements PropertyInterface {
   }
 }
 
-export default MultiSelect;
+export { MultiSelect };
+export * from './types';

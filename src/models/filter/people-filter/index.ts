@@ -1,5 +1,5 @@
-import { Filter, NotionPropertyFilter } from '../types';
-import { PeopleFilterTypes } from './types';
+import { Filter, NotionPropertyFilter } from '..';
+import { PeopleFilterTypes } from '.';
 
 /**
  * Class representing a PeopleFilter.
@@ -53,4 +53,5 @@ class PeopleFilter implements Filter {
   }
 }
 
-export default PeopleFilter;
+export { PeopleFilter };
+export * from './types';

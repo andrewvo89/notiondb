@@ -1,6 +1,16 @@
 {
+  "private": true,
   "name": "notiondb",
+  "author": "Andrew Vo-Nguyen",
   "version": "1.0.0",
+  "description": "NotionDB is a object modelling tool designed to interface with Notion Databases. It is a tool to allow developers to easily spin up a cloud based database using Notion Databases, consisting of a series of Notion Pages (database rows) with various Properties (database columns).",
+  "keywords": [
+    "notion",
+    "database",
+    "notiondb",
+    "odm",
+    "nodejs"
+  ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
@@ -8,7 +18,10 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
-    "start": "tsc && node lib/index.js"
+    "start": "tsc && node lib/index.js",
+    "prepare": "yarn run build",
+    "prepublishOnly": "yarn run lint",
+    "preversion": "yarn run lint"
   },
   "dependencies": {
     "axios": "^0.21.1",

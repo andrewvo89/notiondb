@@ -1,5 +1,5 @@
-import { CompountFilterTypes } from './types';
-import { Filter } from '../types';
+import { CompountFilterTypes } from '.';
+import { Filter } from '..';
 
 /**
  * Class representing a CompoundFilter.
@@ -59,4 +59,5 @@ class CompoundFilter implements Filter {
   }
 }
 
-export default CompoundFilter;
+export { CompoundFilter };
+export * from './types';

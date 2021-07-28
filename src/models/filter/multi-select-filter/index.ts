@@ -1,5 +1,5 @@
-import { Filter, NotionPropertyFilter } from '../types';
-import { MultiSelectFilterTypes } from './types';
+import { Filter, NotionPropertyFilter } from '..';
+import { MultiSelectFilterTypes } from '.';
 
 /**
  * Class representing a MultiSelectFilter.
@@ -59,4 +59,5 @@ class MultiSelectFilter implements Filter {
   }
 }
 
-export default MultiSelectFilter;
+export { MultiSelectFilter };
+export * from './types';

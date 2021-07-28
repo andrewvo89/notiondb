@@ -1,12 +1,9 @@
-import NotionId from '../notion/notion-id';
-import NotionUrl from '../notion/notion-url';
-import Page from '../page';
-import User from '../user';
-import { NotionProperty } from '../notion/types';
-import { PageOptions } from '../page/types';
-import axios, { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
+import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { DatabaseObject, DatabaseResponse } from './types';
-import PropertySchema from '../property-schema';
+import { NotionId, NotionProperty, NotionUrl } from '../notion';
+import { Page, User } from '..';
+import { PageOptions } from '../page';
+import { PropertySchema } from '../../schema';
 
 /**
  * Class representing a Notion Database.
@@ -307,4 +304,4 @@ class Database {
   }
 }
 
-export default Database;
+export { Database };

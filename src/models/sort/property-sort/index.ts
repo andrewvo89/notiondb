@@ -1,4 +1,4 @@
-import { NotionSort, Sort, SortDirection } from '../types';
+import { NotionSort, Sort, SortDirection } from '..';
 
 /**
  * Class representing a PropertySort.
@@ -43,4 +43,4 @@ class PropertySort implements Sort {
   }
 }
 
-export default PropertySort;
+export { PropertySort };

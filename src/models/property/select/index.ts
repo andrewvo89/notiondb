@@ -1,5 +1,5 @@
-import { PropertyInterface } from '../types';
-import { SelectNotionValue, SelectPropertyObject } from './types';
+import { PropertyInterface } from '..';
+import { SelectNotionValue } from '.';
 
 /**
  * Class representing a Select Notion type.
@@ -44,4 +44,5 @@ class Select implements PropertyInterface {
   }
 }
 
-export default Select;
+export { Select };
+export * from './types';

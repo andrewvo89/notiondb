@@ -1,5 +1,5 @@
-import { PropertyInterface } from '../types';
-import { TitleNotionValue, TitlePropertyObject } from './types';
+import { PropertyInterface } from '..';
+import { TitleNotionValue } from '.';
 
 /**
  * Class representing a Title Notion type.
@@ -52,4 +52,5 @@ class Title implements PropertyInterface {
   }
 }
 
-export default Title;
+export { Title };
+export * from './types';

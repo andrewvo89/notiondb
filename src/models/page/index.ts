@@ -1,8 +1,6 @@
-import axios, { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
-import NotionId from '../notion/notion-id';
-import NotionUrl from '../notion/notion-url';
-import { NotionProperty } from '../notion/types';
-import { PageObject, PageOptions, PageResponse } from './types';
+import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
+import { NotionId, NotionProperty, NotionUrl } from '../notion';
+import { PageObject, PageOptions, PageResponse } from '.';
 import {
   transformFromNotionProperties,
   transformToNotionProperties,
@@ -499,9 +497,6 @@ class Page {
     return setArchived(notionProperties, pageId, false);
   }
 }
-
-export default Page;
-
 /**
  * Updates a a Page using it's Page ID.
  * @param {NotionProperty[]} notionProperties
@@ -626,3 +621,6 @@ async function setArchived(
   }
   return page;
 }
+
+export { Page };
+export * from './types';

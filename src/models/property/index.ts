@@ -1,27 +1,13 @@
-import Checkbox from './checkbox';
-import Date from './date';
-import Email from './email';
-import MultiSelect from './multi-select';
-import Number from './number';
-import People from './people';
-import PhoneNumber from './phone-number';
-import RichText from './rich-text';
-import Select from './select';
-import Title from './title';
-import URL from './url';
-
-const Property = {
-  Title,
-  RichText,
-  Number,
-  Select,
-  MultiSelect,
-  Date,
-  Checkbox,
-  URL,
-  Email,
-  PhoneNumber,
-  People,
-};
-
-export default Property;
+export * from './checkbox';
+export * from './checkbox';
+export * from './date';
+export * from './email';
+export * from './multi-select';
+export * from './number';
+export * from './people';
+export * from './phone-number';
+export * from './rich-text';
+export * from './select';
+export * from './title';
+export * from './url';
+export * from './types';

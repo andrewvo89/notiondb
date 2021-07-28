@@ -1,5 +1,5 @@
-import { Filter, NotionPropertyFilter } from '../types';
-import { NumberFilterTypes } from './types';
+import { Filter, NotionPropertyFilter } from '..';
+import { NumberFilterTypes } from '.';
 
 /**
  * Class representing a NumberFilter.
@@ -63,4 +63,5 @@ class NumberFilter implements Filter {
   }
 }
 
-export default NumberFilter;
+export { NumberFilter };
+export * from './types';

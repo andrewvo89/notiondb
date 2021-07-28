@@ -43,4 +43,4 @@ class SchemaObject {
   }
 }
 
-export default SchemaObject;
+export { SchemaObject };

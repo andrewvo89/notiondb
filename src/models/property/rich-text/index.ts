@@ -1,5 +1,5 @@
-import { PropertyInterface } from '../types';
-import { RichTextNotionValue, RichTextPropertyObject } from './types';
+import { PropertyInterface } from '..';
+import { RichTextNotionValue } from '.';
 
 /**
  * Class representing a RichText Notion type.
@@ -52,4 +52,5 @@ class RichText implements PropertyInterface {
   }
 }
 
-export default RichText;
+export { RichText };
+export * from './types';

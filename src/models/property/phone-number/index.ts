@@ -1,5 +1,5 @@
-import { PhoneNumberNotionValue, PhoneNumberPropertyObject } from './types';
-import { PropertyInterface } from '../types';
+import { PhoneNumberNotionValue } from '.';
+import { PropertyInterface } from '..';
 
 /**
  * Class representing a PhoneNumber Notion type.
@@ -42,4 +42,5 @@ class PhoneNumber implements PropertyInterface {
   }
 }
 
-export default PhoneNumber;
+export { PhoneNumber };
+export * from './types';

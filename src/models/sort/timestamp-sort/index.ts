@@ -1,4 +1,4 @@
-import { NotionSort, Sort, SortDirection, TimestampSortType } from '../types';
+import { NotionSort, Sort, SortDirection, TimestampSortType } from '..';
 
 /**
  * Class representing a TimestampSort.
@@ -33,4 +33,4 @@ class TimestampSort implements Sort {
   }
 }
 
-export default TimestampSort;
+export { TimestampSort };

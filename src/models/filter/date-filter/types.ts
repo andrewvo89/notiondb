@@ -10,7 +10,7 @@ import {
   PastMonth,
   PastWeek,
   PastYear,
-} from '../types';
+} from '..';
 
 type DateFilterTypes =
   | Equals

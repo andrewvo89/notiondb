@@ -1,6 +1,6 @@
-import { Filter } from '../filter/types';
-import { NotionPropertyData } from '../notion/types';
-import { Sort } from '../sort/types';
+import { Filter } from '../filter';
+import { NotionPropertyData } from '../notion';
+import { Sort } from '../sort';
 
 interface PageResponse {
   object: 'page';

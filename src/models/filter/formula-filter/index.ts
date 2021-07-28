@@ -1,9 +1,12 @@
-import CheckboxFilter from '../checkbox-filter';
-import DateFilter from '../date-filter';
-import NumberFilter from '../number-filter';
-import TextFilter from '../text-filter';
-import { Filter, NotionPropertyFilter } from '../types';
-import { FormulaFilterTypes } from './types';
+import {
+  CheckboxFilter,
+  DateFilter,
+  NumberFilter,
+  TextFilter,
+  Filter,
+  NotionPropertyFilter,
+} from '..';
+import { FormulaFilterTypes } from '.';
 
 /**
  * Class representing a ForumlaFilter.
@@ -51,4 +54,5 @@ class FormulaFilter implements Filter {
   }
 }
 
-export default FormulaFilter;
+export { FormulaFilter };
+export * from './types';

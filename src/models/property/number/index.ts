@@ -1,5 +1,5 @@
-import { NumberNotionValue, NumberPropertyObject } from './types';
-import { PropertyInterface } from '../types';
+import { NumberNotionValue } from '.';
+import { PropertyInterface } from '..';
 
 /**
  * Class representing a Number Notion type.
@@ -41,4 +41,5 @@ class Number implements PropertyInterface {
   }
 }
 
-export default Number;
+export { Number };
+export * from './types';

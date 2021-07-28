@@ -1,4 +1,4 @@
-import { NotionProperty, RichTextObject } from './../notion/types';
+import { NotionProperty, RichTextObject } from './../notion';
 
 interface DatabaseResponse {
   object: 'database';

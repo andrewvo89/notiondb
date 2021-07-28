@@ -1,4 +1,4 @@
-import { IsEmpty, IsNotEmpty } from '../types';
+import { IsEmpty, IsNotEmpty } from '..';
 
 type FileFilterTypes = IsEmpty | IsNotEmpty;
 

@@ -1,4 +1,4 @@
-import SchemaObject from './schema-object';
+import { SchemaObject } from '..';
 
 /**
  * Class representing a PropertySchema.
@@ -33,4 +33,4 @@ class PropertySchema {
   }
 }
 
-export default PropertySchema;
+export { PropertySchema };

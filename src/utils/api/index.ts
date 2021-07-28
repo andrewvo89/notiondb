@@ -23,6 +23,4 @@ const BACK_OFF_TIME = 1000 / MAX_CALLS_PER_SECOND;
 /** Maximum amount of tries for an API action before throwing an error. */
 const MAX_RETRIES = 5;
 
-export { BACK_OFF_TIME, MAX_RETRIES };
-
-export default axios;
+export { axios, BACK_OFF_TIME, MAX_RETRIES };

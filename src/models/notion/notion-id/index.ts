@@ -30,4 +30,4 @@ class NotionId {
   }
 }
 
-export default NotionId;
+export { NotionId };

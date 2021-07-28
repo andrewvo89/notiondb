@@ -1,4 +1,4 @@
-export interface Annotations {
+interface Annotations {
   bold: boolean;
   italic: boolean;
   strikethrough: boolean;
@@ -26,7 +26,7 @@ export interface Annotations {
     | 'red_background';
 }
 
-export interface RichTextObject {
+interface RichTextObject {
   plain_text: string;
   href?: string;
   annotations: Annotations;
@@ -37,20 +37,20 @@ export interface RichTextObject {
   };
 }
 
-export interface NotionProperty {
+interface NotionProperty {
   id: string;
   type: PropertyType;
   name: string;
   [key: string]: any;
 }
 
-export interface NotionPropertyData {
+interface NotionPropertyData {
   id: string;
   type: PropertyType;
   [key: string]: any;
 }
 
-export type PropertyType =
+type PropertyType =
   | 'title'
   | 'rich_text'
   | 'number'
@@ -70,3 +70,11 @@ export type PropertyType =
   | 'created_by'
   | 'last_edited_time'
   | 'last_edited_by';
+
+export {
+  Annotations,
+  RichTextObject,
+  NotionProperty,
+  NotionPropertyData,
+  PropertyType,
+};

@@ -1,5 +1,5 @@
-import { EmailNotionValue, EmailPropertyObject } from './types';
-import { PropertyInterface } from '../types';
+import { EmailNotionValue } from '.';
+import { PropertyInterface } from '..';
 
 /**
  * Class representing a Email Notion type.
@@ -42,4 +42,5 @@ class Email implements PropertyInterface {
   }
 }
 
-export default Email;
+export { Email };
+export * from './types';

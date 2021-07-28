@@ -1,5 +1,5 @@
-import { CheckboxNotionValue, CheckboxPropertyObject } from './types';
-import { PropertyInterface } from '../types';
+import { CheckboxNotionValue } from '.';
+import { PropertyInterface } from '..';
 
 /**
  * Class representing a Checkbox Notion type.
@@ -42,4 +42,5 @@ class Checkbox implements PropertyInterface {
   }
 }
 
-export default Checkbox;
+export { Checkbox };
+export * from './types';

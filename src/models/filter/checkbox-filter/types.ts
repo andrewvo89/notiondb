@@ -1,4 +1,4 @@
-import { DoesNotEqual, Equals } from '../types';
+import { DoesNotEqual, Equals } from '..';
 
 type CheckboxFilterTypes = Equals | DoesNotEqual;
 

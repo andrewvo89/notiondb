@@ -1,4 +1,4 @@
-import { NotionSort, Sort, SortDirection, TimestampSortType } from '../types';
+import { NotionSort, Sort, SortDirection, TimestampSortType } from '..';
 
 /**
  * Class representing a PropertyAndTimestampSort.
@@ -51,4 +51,4 @@ class PropertyAndTimestampSort implements Sort {
   }
 }
 
-export default PropertyAndTimestampSort;
+export { PropertyAndTimestampSort };
