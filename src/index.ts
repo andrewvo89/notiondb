@@ -7,7 +7,8 @@ import { Database } from './models';
  */
 class NotionDB {
   /**
-   * Creates an instance of NotionDB.
+   * Creates an instance of NotionDB with an integration key.
+   * An Integration needs to be created at https://www.notion.so/my-integrations.
    * @param {string} integrationToken
    * @memberof NotionDB
    */
@@ -15,6 +16,11 @@ class NotionDB {
     axios.defaults.headers.common.Authorization = integrationToken;
   }
 
+  /**
+   * Static Database methods.
+   * @readonly
+   * @memberof NotionDB
+   */
   get databases() {
     return {
       get: Database.get,

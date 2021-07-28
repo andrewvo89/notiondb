@@ -1,7 +1,15 @@
+/**
+ * Mandatory method each Filter has to implement.
+ * @interface Filter
+ */
 interface Filter {
   transformToNotionFilter: () => Record<string, any>;
 }
 
+/**
+ * Shape of the Filter object send to the Notion API.
+ * @interface NotionPropertyFilter
+ */
 interface NotionPropertyFilter {
   property: string;
   checkbox?: {

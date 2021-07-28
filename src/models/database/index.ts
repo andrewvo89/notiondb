@@ -84,7 +84,7 @@ class Database {
   }
 
   /**
-   * Get access to Database pages.
+   * Static Page methods.
    * @readonly
    * @memberof Database
    */
@@ -108,7 +108,7 @@ class Database {
   }
 
   /**
-   * Get access to Database users.
+   * Static User methods.
    * @readonly
    * @memberof Database
    */
@@ -229,7 +229,10 @@ class Database {
   }
 
   /**
-   * Creates a Database inside a parent Page using a Property Schema.
+   * Creates a Database inside a Parent Page using a Property Schema.
+   * New Databases cannot be created on the root of a Workspace and must be created in an existing Page.
+   * Parent Page must be have block children and not a Database page.
+   * It cannot be a Table, Board, List, Calendar, Gallery, Timeline etc.
    * @static
    * @param {(NotionUrl | NotionId)} parentPageIdentifier
    * @param {string} title

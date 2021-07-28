@@ -1,5 +1,4 @@
 export * from './checkbox';
-export * from './checkbox';
 export * from './date';
 export * from './email';
 export * from './multi-select';

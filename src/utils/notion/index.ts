@@ -1,26 +1,47 @@
-import CheckboxFilter from '../../models/filter/checkbox-filter';
-import CompoundFilter from '../../models/filter/compound-filter';
-import DateFilter from '../../models/filter/date-filter';
-import FileFilter from '../../models/filter/file-filter';
-import FormulaFilter from '../../models/filter/formula-filter';
-import MultiSelectFilter from '../../models/filter/multi-select-filter';
-import NumberFilter from '../../models/filter/number-filter';
-import PeopleFilter from '../../models/filter/people-filter';
-import PropertyAndTimestampSort from '../../models/sort/property-and-timestamp-sort';
-import PropertySort from '../../models/sort/property-sort';
-import RelationFilter from '../../models/filter/relation-filter';
-import SelectFilter from '../../models/filter/select-filter';
-import TextFilter from '../../models/filter/text-filter';
-import { Filter } from '../../models/filter/types';
-import { NotionProperty, NotionPropertyData } from '../../models/notion/types';
-import { NotionUrlTypes } from '../../models/notion/notion-url/types';
-import { Sort } from '../../models/sort/types';
+import { PropertyAndTimestampSort, PropertySort } from '../../models/sort';
+import { RelationFilter, SelectFilter } from '../../models/filter';
+import { Sort } from '../../models/sort';
 import { validate as uuidValidate } from 'uuid';
-import Property from '../../models/property';
-import { PropertyInterface } from '../../models/property/types';
+import {
+  Checkbox,
+  Date,
+  Email,
+  MultiSelect,
+  Number,
+  People,
+  PhoneNumber,
+  PropertyInterface,
+  RichText,
+  Select,
+  Title,
+  URL,
+} from '../../models/property';
+import {
+  Filter,
+  TextFilter,
+  CheckboxFilter,
+  CompoundFilter,
+  DateFilter,
+  FileFilter,
+  FormulaFilter,
+  MultiSelectFilter,
+  NumberFilter,
+  PeopleFilter,
+} from '../../models/filter';
+
+import {
+  NotionProperty,
+  NotionPropertyData,
+  NotionUrlTypes,
+} from '../../models/notion';
 
 /**
  * Parses a Notion URL and returns the Notion ID.
+ * Different URL formats for Page and Database.
+ * Example page format:
+ * https://www.notion.so/notion-user/Test-a6d8c987cb684c2aa740a8c99b314ace
+ * Example Database format:
+ * https://www.notion.so/notion-uset/9dbea923e20270b8bccb3138ca2ed54b?v=3cbf978e48034ffa87b9e0c899a5a6d9
  * @param {string} url
  * @param {NotionUrlTypes} type
  * @return {*}  {string}
@@ -205,35 +226,35 @@ function transformToNotionProperties(
       let propertyData: PropertyInterface;
       switch (property.type) {
         case 'title':
-          propertyData = new Property.Title(value);
+          propertyData = new Title(value);
           break;
         case 'rich_text':
-          propertyData = new Property.RichText(value);
+          propertyData = new RichText(value);
           break;
         case 'number':
           // tslint:disable-next-line: no-construct
-          propertyData = new Property.Number(value);
+          propertyData = new Number(value);
           break;
         case 'select':
-          propertyData = new Property.Select(value);
+          propertyData = new Select(value);
           break;
         case 'multi_select':
-          propertyData = new Property.MultiSelect(value);
+          propertyData = new MultiSelect(value);
           break;
         case 'date':
-          propertyData = new Property.Date(value);
+          propertyData = new Date(value);
           break;
         case 'checkbox':
-          propertyData = new Property.Checkbox(value);
+          propertyData = new Checkbox(value);
           break;
         case 'url':
-          propertyData = new Property.URL(value);
+          propertyData = new URL(value);
           break;
         case 'email':
-          propertyData = new Property.Email(value);
+          propertyData = new Email(value);
           break;
         case 'phone_number':
-          propertyData = new Property.PhoneNumber(value);
+          propertyData = new PhoneNumber(value);
           break;
         default:
           return notionProperties;
@@ -256,27 +277,27 @@ function transformFromNotionProperties(propertyData: NotionPropertyData): any {
   const data = propertyData[propertyData.type];
   switch (propertyData.type) {
     case 'title':
-      return Property.Title.getValue({ title: data });
+      return Title.getValue({ title: data });
     case 'rich_text':
-      return Property.RichText.getValue({ rich_text: data });
+      return RichText.getValue({ rich_text: data });
     case 'number':
-      return Property.Number.getValue({ number: data });
+      return Number.getValue({ number: data });
     case 'select':
-      return Property.Select.getValue({ select: data });
+      return Select.getValue({ select: data });
     case 'multi_select':
-      return Property.MultiSelect.getValue({ multi_select: data });
+      return MultiSelect.getValue({ multi_select: data });
     case 'date':
-      return Property.Date.getValue({ date: data });
+      return Date.getValue({ date: data });
     case 'checkbox':
-      return Property.Checkbox.getValue({ checkbox: data });
+      return Checkbox.getValue({ checkbox: data });
     case 'url':
-      return Property.URL.getValue({ url: data });
+      return URL.getValue({ url: data });
     case 'email':
-      return Property.Email.getValue({ email: data });
+      return Email.getValue({ email: data });
     case 'phone_number':
-      return Property.PhoneNumber.getValue({ phone_number: data });
+      return PhoneNumber.getValue({ phone_number: data });
     case 'people':
-      return Property.People.getValue({ people: data });
+      return People.getValue({ people: data });
     case 'formula': {
       const type = propertyData.formula.type;
       return transformFromNotionProperties({

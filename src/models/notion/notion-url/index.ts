@@ -9,6 +9,12 @@ class NotionUrl {
   #url: string;
   #type: NotionUrlTypes;
 
+  /**
+   * Creates an instance of NotionUrl.
+   * @param {string} url
+   * @param {NotionUrlTypes} type
+   * @memberof NotionUrl
+   */
   constructor(url: string, type: NotionUrlTypes) {
     this.#url = url;
     this.#type = type;

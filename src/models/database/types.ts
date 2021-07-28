@@ -1,5 +1,9 @@
 import { NotionProperty, RichTextObject } from './../notion';
 
+/**
+ * Shape of response that is returned from the Notion API.
+ * @interface DatabaseResponse
+ */
 interface DatabaseResponse {
   object: 'database';
   id: string;
@@ -13,6 +17,10 @@ interface DatabaseResponse {
   };
 }
 
+/**
+ * Transformed object.
+ * @interface DatabaseObject
+ */
 interface DatabaseObject {
   id: string;
   title: string;

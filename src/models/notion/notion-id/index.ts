@@ -6,6 +6,12 @@ import { getIdFromId } from '../../../utils/notion';
  */
 class NotionId {
   #id: string;
+
+  /**
+   * Creates an instance of NotionId.
+   * @param {string} id
+   * @memberof NotionId
+   */
   constructor(id: string) {
     this.#id = id;
   }
