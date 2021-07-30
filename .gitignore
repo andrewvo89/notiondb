@@ -44,3 +44,4 @@ typings/
 lib
 test/*.js
 *.map
+ignore

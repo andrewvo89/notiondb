@@ -23,6 +23,7 @@ interface PageOptions {
 
 interface PageObject {
   id: string;
+  title: string;
   url: string;
   archived: boolean;
   createdTime: globalThis.Date;

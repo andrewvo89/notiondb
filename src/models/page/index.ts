@@ -16,6 +16,7 @@ import {
  */
 class Page {
   #id: string;
+  #title: string;
   #url: string;
   #notionProperties: NotionProperty[];
   #properties: Record<string, any>;
@@ -26,6 +27,7 @@ class Page {
   /**
    * Creates an instance of Page.
    * @param {string} id
+   * @param {string} title
    * @param {string} url
    * @param {NotionProperty[]} notionProperties
    * @param {Record<string, any>} properties
@@ -36,6 +38,7 @@ class Page {
    */
   constructor(
     id: string,
+    title: string,
     url: string,
     notionProperties: NotionProperty[],
     properties: Record<string, any>,
@@ -44,32 +47,13 @@ class Page {
     lastEditedTime: globalThis.Date,
   ) {
     this.#id = id;
+    this.#title = title;
     this.#url = url;
     this.#notionProperties = notionProperties;
     this.#properties = properties;
     this.#archived = archived;
     this.#createdTime = createdTime;
     this.#lastEditedTime = lastEditedTime;
-  }
-
-  /**
-   * Gets the property data from the Page.
-   * @readonly
-   * @type {Record<string, any>}
-   * @memberof Page
-   */
-  get properties(): Record<string, any> {
-    return this.#properties;
-  }
-
-  /**
-   * Gets whether or not the Page is archived (deleted).
-   * @readonly
-   * @type {boolean}
-   * @memberof Page
-   */
-  get archived(): boolean {
-    return this.#archived;
   }
 
   /**
@@ -81,6 +65,7 @@ class Page {
   get object(): PageObject {
     return {
       id: this.#id,
+      title: this.#title,
       url: this.#url,
       archived: this.#archived,
       createdTime: this.#createdTime,
@@ -89,7 +74,12 @@ class Page {
     };
   }
 
-  get children() {
+  /**
+   * Gets access to children Blocks.
+   * @readonly
+   * @memberof Page
+   */
+  get blocks() {
     return {
       getAll: () => Block.getAll(new NotionId(this.#id)),
     };
@@ -116,10 +106,14 @@ class Page {
       try {
         const response = await axios.get(`/pages/${pageId}`);
         const result = response.data as PageResponse;
+        let title: string = '';
         const properties = Object.entries(result.properties).reduce(
           (prevProperties: Record<string, any>, [propertyName, value]) => {
             if (excludeProperties?.includes(propertyName)) {
               return prevProperties;
+            }
+            if (value.type === 'title') {
+              title = transformFromNotionProperties(value);
             }
             return {
               ...prevProperties,
@@ -130,6 +124,7 @@ class Page {
         );
         page = new Page(
           result.id,
+          title,
           result.url,
           notionProperties,
           properties,
@@ -220,8 +215,12 @@ class Page {
         }
         pages.push(
           ...results.map((result: PageResponse) => {
+            let title: string = '';
             const properties = Object.entries(result.properties).reduce(
               (prevProperties: Record<string, any>, [propertyName, value]) => {
+                if (value.type === 'title') {
+                  title = transformFromNotionProperties(value);
+                }
                 if (excludeProperties?.includes(propertyName)) {
                   return prevProperties;
                 }
@@ -234,6 +233,7 @@ class Page {
             );
             const page = new Page(
               result.id,
+              title,
               result.url,
               notionProperties,
               properties,
@@ -300,8 +300,12 @@ class Page {
         }
         pages.push(
           ...results.map((result: PageResponse) => {
+            let title: string = '';
             const properties = Object.entries(result.properties).reduce(
               (prevProperties: Record<string, any>, [propertyName, value]) => {
+                if (value.type === 'title') {
+                  title = transformFromNotionProperties(value);
+                }
                 if (excludeProperties?.includes(propertyName)) {
                   return prevProperties;
                 }
@@ -314,6 +318,7 @@ class Page {
             );
             const page = new Page(
               result.id,
+              title,
               result.url,
               notionProperties,
               properties,
@@ -381,8 +386,12 @@ class Page {
           properties: transformToNotionProperties(notionProperties, data),
         });
         const result = response.data as PageResponse;
+        let title: string = '';
         const properties = Object.entries(result.properties).reduce(
           (prevProperties: Record<string, any>, [propertyName, value]) => {
+            if (value.type === 'title') {
+              title = transformFromNotionProperties(value);
+            }
             return {
               ...prevProperties,
               [propertyName]: transformFromNotionProperties(value),
@@ -392,6 +401,7 @@ class Page {
         );
         page = new Page(
           result.id,
+          title,
           result.url,
           notionProperties,
           properties,
@@ -533,8 +543,12 @@ async function update(
         properties: transformToNotionProperties(notionProperties, data),
       });
       const result = response.data as PageResponse;
+      let title: string = '';
       const properties = Object.entries(result.properties).reduce(
         (prevProperties: Record<string, any>, [propertyName, value]) => {
+          if (value.type === 'title') {
+            title = transformFromNotionProperties(value);
+          }
           return {
             ...prevProperties,
             [propertyName]: transformFromNotionProperties(value),
@@ -544,6 +558,7 @@ async function update(
       );
       page = new Page(
         result.id,
+        title,
         result.url,
         notionProperties,
         properties,
@@ -592,8 +607,12 @@ async function setArchived(
         archived,
       });
       const result = response.data as PageResponse;
+      let title: string = '';
       const properties = Object.entries(result.properties).reduce(
         (prevProperties: Record<string, any>, [propertyName, value]) => {
+          if (value.type === 'title') {
+            title = transformFromNotionProperties(value);
+          }
           return {
             ...prevProperties,
             [propertyName]: transformFromNotionProperties(value),
@@ -603,6 +622,7 @@ async function setArchived(
       );
       page = new Page(
         result.id,
+        title,
         result.url,
         notionProperties,
         properties,

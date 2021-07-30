@@ -41,6 +41,23 @@ class Block {
   }
 
   /**
+   * Get the JavaScript object representing the Block.
+   * @readonly
+   * @type {BlockObject}
+   * @memberof Block
+   */
+  get object(): BlockObject {
+    return {
+      id: this.#id,
+      type: this.#type,
+      createdTime: this.#createdTime,
+      lastEditedTime: this.#lastEditedTime,
+      hasChildren: this.#hasChildren,
+      data: this.#data,
+    };
+  }
+
+  /**
    * Gets all Blocks from a parent Block Notion ID or Notion URL.
    * @static
    * @param {(NotionId | NotionUrl)} identifier
@@ -95,17 +112,6 @@ class Block {
       }
     } while (hasMore);
     return blocks;
-  }
-
-  get object(): BlockObject {
-    return {
-      id: this.#id,
-      type: this.#type,
-      createdTime: this.#createdTime,
-      lastEditedTime: this.#lastEditedTime,
-      hasChildren: this.#hasChildren,
-      data: this.#data,
-    };
   }
 }
 

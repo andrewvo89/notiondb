@@ -28,46 +28,6 @@ class User {
   }
 
   /**
-   * Get the User's ID.
-   * @readonly
-   * @type {string}
-   * @memberof User
-   */
-  get id(): string {
-    return this.#id;
-  }
-
-  /**
-   * Get the User's name.
-   * @readonly
-   * @type {string}
-   * @memberof User
-   */
-  get name(): string {
-    return this.#name;
-  }
-
-  /**
-   * Get the User's Avatar URL.
-   * @readonly
-   * @type {string}
-   * @memberof User
-   */
-  get avatar(): string | null {
-    return this.#avatar;
-  }
-
-  /**
-   * Gets the User's Email if it is avaiable.
-   * @readonly
-   * @type {(string | null)}
-   * @memberof User
-   */
-  get email(): string | null {
-    return this.#email;
-  }
-
-  /**
    * Get the JavaScript object representing the User.
    * @readonly
    * @type {UserObject}

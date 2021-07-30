@@ -38,36 +38,6 @@ class Database {
   }
 
   /**
-   * Get Database ID.
-   * @readonly
-   * @type {string}
-   * @memberof Database
-   */
-  get id(): string {
-    return this.#id;
-  }
-
-  /**
-   * Get Databae title.
-   * @readonly
-   * @type {string}
-   * @memberof Database
-   */
-  get title(): string {
-    return this.#title;
-  }
-
-  /**
-   * Get Database properties.
-   * @readonly
-   * @type {NotionProperty[]}
-   * @memberof Database
-   */
-  get properties(): NotionProperty[] {
-    return this.#properties;
-  }
-
-  /**
    * Get the JavaScript object representing the Database.
    * @readonly
    * @type {DatabaseObject}
