@@ -55,6 +55,10 @@ If you would like to donate to the project, you can buy me a coffee.
 - Delete a Page from a Database.
 - Restore a deleted Page from a Database.
 
+### Blocks
+
+- Get all supported children Blocks from a Page.
+
 ### Users
 
 - Get all Users from a Database.
@@ -304,6 +308,16 @@ const restoredPage = await page.restore();
 // Use static restore method to restore (unarchive) blindly using a Notion ID or Notion URL
 const id = new NotionId('ec51a30420fe800db023d48671466f29');
 const restoredPage = await database.pages.restore(id);
+```
+
+### Blocks
+
+#### Get all children Blocks of a Page.
+
+```javascript
+// Get an existing Page reference first
+const blocks = await page.blocks.getAll();
+console.log(blocks.map((b) => b.object));
 ```
 
 ### Users
