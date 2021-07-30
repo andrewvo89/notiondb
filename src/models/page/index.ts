@@ -1,5 +1,6 @@
 import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
-import { NotionId, NotionProperty, NotionUrl } from '../notion';
+import { Block } from '..';
+import { NotionId, NotionProperty, NotionUrl } from '..';
 import { PageObject, PageOptions, PageResponse } from '.';
 import {
   transformFromNotionProperties,
@@ -85,6 +86,12 @@ class Page {
       createdTime: this.#createdTime,
       lastEditedTime: this.#lastEditedTime,
       properties: this.#properties,
+    };
+  }
+
+  get children() {
+    return {
+      getAll: () => Block.getAll(new NotionId(this.#id)),
     };
   }
 

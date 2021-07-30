@@ -1,3 +1,4 @@
+export * from './block';
 export * from './database';
 export * from './notion';
 export * from './page';
