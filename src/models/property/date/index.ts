@@ -46,32 +46,38 @@ class Date implements PropertyInterface {
       }
       if (timezone) {
         dateProperties.start = dayjs
-          .tz(dateProperties.start, timezone)
+          .tz(this.#start, timezone)
           .format('YYYY-MM-DD');
-        if (dateProperties.end) {
-          dateProperties.end = dayjs
-            .tz(dateProperties.end, timezone)
-            .format('YYYY-MM-DD');
+        if (end) {
+          dateProperties.end = dayjs.tz(end, timezone).format('YYYY-MM-DD');
         }
       }
       if (includeTime) {
-        const startIsoString = dayjs(dateProperties.start).toISOString();
-        const endIsoString = dayjs(dateProperties.end).toISOString();
+        const startIsoString = dayjs.tz(this.#start, timezone).toISOString();
         if (timezone) {
-          const offset =
-            dayjs.tz(dateProperties.start, timezone).utcOffset() / 60;
+          const offset = dayjs.tz(this.#start, timezone).utcOffset() / 60;
           const startOffsetIsoString = dayjs
-            .utc(startIsoString)
-            .utcOffset(offset, true)
-            .format();
-          const endOffsetIsoString = dayjs
-            .utc(endIsoString)
+            .tz(this.#start, timezone)
             .utcOffset(offset, true)
             .format();
           dateProperties.start = startOffsetIsoString;
-          dateProperties.end = endOffsetIsoString;
+          if (end) {
+            const endOffsetIsoString = dayjs
+              .tz(end, timezone)
+              .set('hours', dayjs(this.#start).get('hours'))
+              .set('minutes', dayjs(this.#start).get('minutes'))
+              .set('seconds', dayjs(this.#start).get('seconds'))
+              .set('milliseconds', dayjs(this.#start).get('milliseconds'))
+              .utcOffset(offset, true)
+              .format();
+            dateProperties.end = endOffsetIsoString;
+          }
         } else {
           dateProperties.start = startIsoString;
+          if (end) {
+            const endIsoString = dayjs(dateProperties.end).toISOString();
+            dateProperties.end = endIsoString;
+          }
         }
       }
     }
