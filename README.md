@@ -195,7 +195,7 @@ console.log(pages.map((p) => p.object));
  */
 const priceFilter = new NumberFilter('Price', 'greater_than', 5);
 const productFilter = new SelectFilter('Product', 'equals', 'Sunglasses');
-const compoundFilter = new CompoundFilter(priceFilter, 'and', productFilter);
+const compoundFilter = new CompoundFilter([priceFilter, productFilter], 'and');
 
 const options = {
   filter: compoundFilter,
@@ -212,16 +212,15 @@ console.log(pages.map((p) => p.object));
  */
 const priceFilter = new NumberFilter('Price', 'greater_than', 5);
 const productFilter = new SelectFilter('Product', 'equals', 'Sunglasses');
-const compoundFilter = new CompoundFilter(priceFilter, 'and', productFilter);
+const compoundFilter = new CompoundFilter([priceFilter, productFilter], 'and');
 const readingGlassesFilter = new SelectFilter(
   'Product',
   'equals',
   'Reading Glasses',
 );
 const topLevelCompoundFilter = new CompoundFilter(
-  compoundFilter,
+  [compoundFilter, readingGlassesFilter],
   'or',
-  readingGlassesFilter,
 );
 
 const options = {

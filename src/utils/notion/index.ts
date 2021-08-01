@@ -118,8 +118,13 @@ function getFilterPropertyNames(filter: Filter): string[] {
   const propertyNames: string[] = [];
   if (filter instanceof CompoundFilter) {
     propertyNames.push(
-      ...getFilterPropertyNames(filter.filter1),
-      ...getFilterPropertyNames(filter.filter2),
+      ...filter.filters.reduce(
+        (prevPropertyNames: string[], currFilter) => [
+          ...prevPropertyNames,
+          ...getFilterPropertyNames(currFilter),
+        ],
+        [],
+      ),
     );
   }
   if (

@@ -7,41 +7,28 @@ import { Filter } from '..';
  * @implements {Filter}
  */
 class CompoundFilter implements Filter {
-  #filter1: Filter;
+  #filters: Filter[];
   #type: CompountFilterTypes;
-  #filter2: Filter;
 
   /**
    * Creates an instance of a CompoundFilter.
-   * @param {Filter} filter1
+   * @param {Filter[]} filters
    * @param {CompountFilterTypes} type
-   * @param {Filter} filter2
    * @memberof CompoundFilter
    */
-  constructor(filter1: Filter, type: CompountFilterTypes, filter2: Filter) {
-    this.#filter1 = filter1;
+  constructor(filters: Filter[], type: CompountFilterTypes) {
+    this.#filters = filters;
     this.#type = type;
-    this.#filter2 = filter2;
   }
 
   /**
-   * Gets the first filter.
+   * Gets the array of Filters.
    * @readonly
-   * @type {Filter}
+   * @type {Filter[]}
    * @memberof CompoundFilter
    */
-  get filter1(): Filter {
-    return this.#filter1;
-  }
-
-  /**
-   * Gets the second filter
-   * @readonly
-   * @type {Filter}
-   * @memberof CompoundFilter
-   */
-  get filter2(): Filter {
-    return this.#filter2;
+  get filters(): Filter[] {
+    return this.#filters;
   }
 
   /**
@@ -51,10 +38,9 @@ class CompoundFilter implements Filter {
    */
   transformToNotionFilter(): Record<string, any> {
     return {
-      [this.#type]: [
-        this.#filter1.transformToNotionFilter(),
-        this.#filter2.transformToNotionFilter(),
-      ],
+      [this.#type]: this.#filters.map((filter) =>
+        filter.transformToNotionFilter(),
+      ),
     };
   }
 }
