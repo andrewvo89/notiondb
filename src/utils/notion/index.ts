@@ -1,3 +1,4 @@
+import { isPropertyOptions, PropertyData } from '../../models';
 import { PropertySort } from '../../models/sort';
 import { RelationFilter, SelectFilter } from '../../models/filter';
 import { Sort } from '../../models/sort';
@@ -206,15 +207,18 @@ function validatePropertiesExist(
 /**
  * Transforms raw data to Notion friendly data to write to a Notion Database.
  * @param {NotionProperty[]} properties
- * @param {Record<string, any>} data
+ * @param {Record<string, PropertyData>} data
  * @return {*}  {Record<string, any>}
  */
 function transformToNotionProperties(
   properties: NotionProperty[],
-  data: Record<string, any>,
+  data: Record<string, PropertyData>,
 ): Record<string, any> {
   return Object.entries(data).reduce(
-    (notionProperties: Record<string, any>, dataProperty: [string, any]) => {
+    (
+      notionProperties: Record<string, any>,
+      dataProperty: [string, PropertyData],
+    ) => {
       const [propertyName, value] = dataProperty;
       const property = properties.find((p) => p.name === propertyName);
       if (!property) {
@@ -223,34 +227,74 @@ function transformToNotionProperties(
       let propertyData: PropertyInterface;
       switch (property.type) {
         case 'title':
+          if (typeof value !== 'string') {
+            throw new Error(`${propertyName} must be a string.`);
+          }
           propertyData = new Title(value);
           break;
         case 'rich_text':
+          if (typeof value !== 'string') {
+            throw new Error(`${propertyName} must be a string.`);
+          }
           propertyData = new RichText(value);
           break;
         case 'number':
+          if (typeof value !== 'number') {
+            throw new Error(`${propertyName} must be a string.`);
+          }
           // tslint:disable-next-line: no-construct
           propertyData = new Number(value);
           break;
         case 'select':
+          if (typeof value !== 'string') {
+            throw new Error(`${propertyName} must be a string.`);
+          }
           propertyData = new Select(value);
           break;
         case 'multi_select':
+          if (!Array.isArray(value)) {
+            throw new Error(`${propertyName} must be an array of string.`);
+          }
+          if (value.some((v) => typeof v !== 'string')) {
+            throw new Error(`${propertyName} must be an array of string.`);
+          }
           propertyData = new MultiSelect(value);
           break;
         case 'date':
-          propertyData = new Date(value);
+          if (
+            isPropertyOptions(value) &&
+            value.value instanceof globalThis.Date
+          ) {
+            propertyData = new Date(value.value, value.options);
+          } else {
+            if (!(value instanceof globalThis.Date)) {
+              throw new Error(`${propertyName} must be date object.`);
+            }
+            propertyData = new Date(value);
+          }
           break;
         case 'checkbox':
+          if (typeof value !== 'boolean') {
+            throw new Error(`${propertyName} must be a boolean.`);
+          }
           propertyData = new Checkbox(value);
           break;
         case 'url':
+          if (typeof value !== 'string') {
+            throw new Error(`${propertyName} must be a string.`);
+          }
           propertyData = new URL(value);
           break;
         case 'email':
+          if (typeof value !== 'string') {
+            throw new Error(`${propertyName} must be a string.`);
+          }
           propertyData = new Email(value);
           break;
         case 'phone_number':
+          if (typeof value !== 'string') {
+            throw new Error(`${propertyName} must be a string.`);
+          }
           propertyData = new PhoneNumber(value);
           break;
         default:

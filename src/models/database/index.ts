@@ -2,7 +2,7 @@ import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { DatabaseObject, DatabaseResponse } from './types';
 import { NotionId, NotionProperty, NotionUrl } from '../notion';
 import { Page, User } from '..';
-import { PageOptions } from '../page';
+import { PageOptions, PropertyData } from '../page';
 import { PropertySchema } from '../../schema';
 
 /**
@@ -66,10 +66,12 @@ class Database {
         Page.getMany(this.#id, this.#properties, options, excludeProperties),
       getAll: (excludeProperties?: string[]) =>
         Page.getAll(this.#id, this.#properties, excludeProperties),
-      create: (data: Record<string, any>) =>
+      create: (data: Record<string, PropertyData>) =>
         Page.create(this.#id, this.#properties, data),
-      update: (identifier: NotionUrl | NotionId, data: Record<string, any>) =>
-        Page.update(this.#properties, identifier, data),
+      update: (
+        identifier: NotionUrl | NotionId,
+        data: Record<string, PropertyData>,
+      ) => Page.update(this.#properties, identifier, data),
       delete: (identifier: NotionUrl | NotionId) =>
         Page.delete(this.#properties, identifier),
       restore: (identifier: NotionUrl | NotionId) =>

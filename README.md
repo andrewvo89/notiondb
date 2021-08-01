@@ -265,6 +265,31 @@ const page = await database.pages.create({
 console.log(page.object);
 ```
 
+#### Create a new Page in an existing Database with additional options for Date.
+
+```javascript
+const startDate = new Date();
+const endDate = new Date();
+endDate.setDate(startDate.getDate() + 2);
+
+// Get an existing Database reference first
+const page = await database.pages.create({
+  'Order ID': uuidv4(),
+  Date: {
+    value: startDate,
+    options: {
+      includeTime: true,
+      timezone: 'Australia/Sydney',
+      end: endDate,
+    },
+  },
+  Product: '3D Glasses',
+  Price: 12.99,
+  Quantity: 15,
+});
+console.log(page.object);
+```
+
 #### Update an existing Page.
 
 ```javascript

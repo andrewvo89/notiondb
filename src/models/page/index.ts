@@ -1,6 +1,7 @@
 import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { Block } from '..';
 import { NotionId, NotionProperty, NotionUrl } from '..';
+import { PropertyData } from './types';
 import { PageObject, PageOptions, PageResponse } from '.';
 import {
   transformFromNotionProperties,
@@ -356,14 +357,14 @@ class Page {
    * @static
    * @param {string} databaseId
    * @param {NotionProperty[]} notionProperties
-   * @param {Record<string, any>} data
+   * @param {Record<string, PropertyData>} data
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
   static async create(
     databaseId: string,
     notionProperties: NotionProperty[],
-    data: Record<string, any>,
+    data: Record<string, PropertyData>,
   ): Promise<Page> {
     let retries = 0;
     const propertyNames = Object.keys(data);
@@ -432,11 +433,11 @@ class Page {
 
   /**
    * Updates the current Page.
-   * @param {Record<string, any>} data
+   * @param {Record<string, PropertyData>} data
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
-  async update(data: Record<string, any>): Promise<Page> {
+  async update(data: Record<string, PropertyData>): Promise<Page> {
     return update(this.#notionProperties, this.#id, data);
   }
 
@@ -445,14 +446,14 @@ class Page {
    * @static
    * @param {NotionProperty[]} notionProperties
    * @param {(NotionUrl | NotionId)} identifier
-   * @param {Record<string, any>} data
+   * @param {Record<string, PropertyData>} data
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
   static update(
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
-    data: Record<string, any>,
+    data: Record<string, PropertyData>,
   ): Promise<Page> {
     const pageId = identifier.getId();
     return update(notionProperties, pageId, data);
@@ -518,13 +519,13 @@ class Page {
  * Updates a a Page using it's Page ID.
  * @param {NotionProperty[]} notionProperties
  * @param {string} pageId
- * @param {Record<string, any>} data
+ * @param {Record<string, PropertyData>} data
  * @return {*}  {Promise<Page>}
  */
 async function update(
   notionProperties: NotionProperty[],
   pageId: string,
-  data: Record<string, any>,
+  data: Record<string, PropertyData>,
 ): Promise<Page> {
   let retries = 0;
   const propertyNames = Object.keys(data);

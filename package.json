@@ -2,7 +2,7 @@
   "name": "notiondb",
   "license": "MIT",
   "author": "Andrew Vo-Nguyen <hello@andrewvo.co> (https://andrewvo.co)",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "NotionDB is a object modelling tool designed to interface with Notion Databases. It is a tool to allow developers to easily spin up a cloud based database using Notion Databases, consisting of a series of Notion Pages (database rows) with various Properties (database columns).",
   "keywords": [
     "notion",

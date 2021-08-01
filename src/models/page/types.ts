@@ -31,4 +31,28 @@ interface PageObject {
   properties: Record<string, any>;
 }
 
-export { PageResponse, PageOptions, PageObject };
+type PropertyData =
+  | string
+  | string[]
+  | number
+  | globalThis.Date
+  | boolean
+  | PropertyOptions;
+
+interface PropertyOptions {
+  value: string | number | globalThis.Date | boolean;
+  options: Record<string, any>;
+}
+
+function isPropertyOptions(object: any): object is PropertyOptions {
+  return 'options' in object && 'value' in object;
+}
+
+export {
+  PageResponse,
+  PageOptions,
+  PageObject,
+  PropertyData,
+  PropertyOptions,
+  isPropertyOptions,
+};
