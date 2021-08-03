@@ -1,4 +1,5 @@
-import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
+import { AxiosInstance } from 'axios';
+import { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { DatabaseObject, DatabaseResponse } from './types';
 import { NotionId, NotionProperty, NotionUrl } from '../notion';
 import { Page, User } from '..';
@@ -15,12 +16,14 @@ class Database {
   #properties: NotionProperty[];
   #createdTime: globalThis.Date;
   #lastEditedTime: globalThis.Date;
+  #axiosInstance: AxiosInstance;
 
   /**
    * Creates an instance of Database.
    * @param {string} id
    * @param {string} title
    * @param {NotionProperty[]} properties
+   * @param {AxiosInstance} axiosInstance
    * @memberof Database
    */
   constructor(
@@ -29,12 +32,14 @@ class Database {
     properties: NotionProperty[],
     createdTime: globalThis.Date,
     lastEditedTime: globalThis.Date,
+    axiosInstance: AxiosInstance,
   ) {
     this.#id = id;
     this.#title = title;
     this.#properties = properties;
     this.#createdTime = createdTime;
     this.#lastEditedTime = lastEditedTime;
+    this.#axiosInstance = axiosInstance;
   }
 
   /**
@@ -61,21 +66,37 @@ class Database {
   get pages() {
     return {
       get: (identifier: NotionUrl | NotionId, excludeProperties?: string[]) =>
-        Page.get(this.#properties, identifier, excludeProperties),
+        Page.get(
+          this.#properties,
+          identifier,
+          this.#axiosInstance,
+          excludeProperties,
+        ),
       getMany: (options: PageOptions, excludeProperties?: string[]) =>
-        Page.getMany(this.#id, this.#properties, options, excludeProperties),
+        Page.getMany(
+          this.#id,
+          this.#properties,
+          options,
+          this.#axiosInstance,
+          excludeProperties,
+        ),
       getAll: (excludeProperties?: string[]) =>
-        Page.getAll(this.#id, this.#properties, excludeProperties),
+        Page.getAll(
+          this.#id,
+          this.#properties,
+          this.#axiosInstance,
+          excludeProperties,
+        ),
       create: (data: Record<string, PropertyData>) =>
-        Page.create(this.#id, this.#properties, data),
+        Page.create(this.#id, this.#properties, data, this.#axiosInstance),
       update: (
         identifier: NotionUrl | NotionId,
         data: Record<string, PropertyData>,
-      ) => Page.update(this.#properties, identifier, data),
+      ) => Page.update(this.#properties, identifier, data, this.#axiosInstance),
       delete: (identifier: NotionUrl | NotionId) =>
-        Page.delete(this.#properties, identifier),
+        Page.delete(this.#properties, identifier, this.#axiosInstance),
       restore: (identifier: NotionUrl | NotionId) =>
-        Page.restore(this.#properties, identifier),
+        Page.restore(this.#properties, identifier, this.#axiosInstance),
     };
   }
 
@@ -86,8 +107,8 @@ class Database {
    */
   get users() {
     return {
-      get: User.get,
-      getAll: User.getAll,
+      get: (identifier: NotionId) => User.get(identifier, this.#axiosInstance),
+      getAll: () => User.getAll(this.#axiosInstance),
     };
   }
 
@@ -95,16 +116,20 @@ class Database {
    * Gets a Notion Database Reference using a Notion URL or Notion ID.
    * @static
    * @param {(NotionUrl | NotionId)} identifier
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Database>}
    * @memberof Database
    */
-  static async get(identifier: NotionUrl | NotionId): Promise<Database> {
+  static async get(
+    identifier: NotionUrl | NotionId,
+    axiosInstance: AxiosInstance,
+  ): Promise<Database> {
     const databaseId = identifier.getId();
     let retries = 0;
     let database: Database | null = null;
     do {
       try {
-        const response = await axios.get(`/databases/${databaseId}`);
+        const response = await axiosInstance.get(`/databases/${databaseId}`);
         const result = response.data as DatabaseResponse;
         const properties = Object.values(result.properties).map(
           (property) =>
@@ -121,6 +146,7 @@ class Database {
           properties,
           new globalThis.Date(result.created_time),
           new globalThis.Date(result.last_edited_time),
+          axiosInstance,
         );
       } catch (error) {
         if (retries === MAX_RETRIES) {
@@ -143,10 +169,11 @@ class Database {
   /**
    * Gets all Notion Database References.
    * @static
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Database[]>}
    * @memberof Database
    */
-  static async getAll(): Promise<Database[]> {
+  static async getAll(axiosInstance: AxiosInstance): Promise<Database[]> {
     const databases: Database[] = [];
     let hasMore: boolean = false;
     let nextCursor: string = '';
@@ -157,7 +184,9 @@ class Database {
         ? `?start_cursor=${nextCursor}`
         : '';
       try {
-        const response = await axios.get(`/databases${nextCursorParam}`);
+        const response = await axiosInstance.get(
+          `/databases${nextCursorParam}`,
+        );
         const results = response.data.results as DatabaseResponse[];
         for (const result of results) {
           const properties = Object.values(result.properties).map(
@@ -175,6 +204,7 @@ class Database {
             properties,
             new globalThis.Date(result.created_time),
             new globalThis.Date(result.last_edited_time),
+            axiosInstance,
           );
           databases.push(database);
         }
@@ -209,6 +239,7 @@ class Database {
    * @param {(NotionUrl | NotionId)} parentPageIdentifier
    * @param {string} title
    * @param {PropertySchema} schema
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Database>}
    * @memberof Database
    */
@@ -216,13 +247,14 @@ class Database {
     parentPageIdentifier: NotionUrl | NotionId,
     title: string,
     schema: PropertySchema,
+    axiosInstance: AxiosInstance,
   ): Promise<Database> {
     const parentPageId = parentPageIdentifier.getId();
     let retries = 0;
     let database: Database | null = null;
     do {
       try {
-        const response = await axios.post('/databases', {
+        const response = await axiosInstance.post('/databases', {
           parent: {
             type: 'page_id',
             page_id: parentPageId,
@@ -259,6 +291,7 @@ class Database {
           properties,
           new globalThis.Date(result.created_time),
           new globalThis.Date(result.last_edited_time),
+          axiosInstance,
         );
       } catch (error) {
         if (retries === MAX_RETRIES) {

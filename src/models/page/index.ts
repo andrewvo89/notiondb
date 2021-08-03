@@ -1,8 +1,9 @@
-import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
+import { AxiosInstance } from 'axios';
+import { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { Block } from '..';
 import { NotionId, NotionProperty, NotionUrl } from '..';
-import { PropertyData } from './types';
 import { PageObject, PageOptions, PageResponse } from '.';
+import { PropertyData } from './types';
 import {
   transformFromNotionProperties,
   transformToNotionProperties,
@@ -24,6 +25,7 @@ class Page {
   #archived: boolean;
   #createdTime: globalThis.Date;
   #lastEditedTime: globalThis.Date;
+  #axiosInstance: AxiosInstance;
 
   /**
    * Creates an instance of Page.
@@ -35,6 +37,7 @@ class Page {
    * @param {boolean} archived
    * @param {globalThis.Date} createdTime
    * @param {globalThis.Date} lastEditedTime
+   * @param {AxiosInstance} axiosInstance
    * @memberof Page
    */
   constructor(
@@ -46,6 +49,7 @@ class Page {
     archived: boolean,
     createdTime: globalThis.Date,
     lastEditedTime: globalThis.Date,
+    axiosInstance: AxiosInstance,
   ) {
     this.#id = id;
     this.#title = title;
@@ -55,6 +59,7 @@ class Page {
     this.#archived = archived;
     this.#createdTime = createdTime;
     this.#lastEditedTime = lastEditedTime;
+    this.#axiosInstance = axiosInstance;
   }
 
   /**
@@ -82,7 +87,7 @@ class Page {
    */
   get blocks() {
     return {
-      getAll: () => Block.getAll(new NotionId(this.#id)),
+      getAll: () => Block.getAll(new NotionId(this.#id), this.#axiosInstance),
     };
   }
 
@@ -91,6 +96,7 @@ class Page {
    * @static
    * @param {NotionProperty[]} notionProperties
    * @param {(NotionUrl | NotionId)} identifier
+   * @param {AxiosInstance} axiosInstance
    * @param {string[]} [excludeProperties]
    * @return {*}  {Promise<Page>}
    * @memberof Page
@@ -98,6 +104,7 @@ class Page {
   static async get(
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
+    axiosInstance: AxiosInstance,
     excludeProperties?: string[],
   ): Promise<Page> {
     const pageId = identifier.getId();
@@ -105,7 +112,7 @@ class Page {
     let page: Page | null = null;
     do {
       try {
-        const response = await axios.get(`/pages/${pageId}`);
+        const response = await axiosInstance.get(`/pages/${pageId}`);
         const result = response.data as PageResponse;
         let title: string = '';
         const properties = Object.entries(result.properties).reduce(
@@ -132,6 +139,7 @@ class Page {
           result.archived,
           new globalThis.Date(result.created_time),
           new globalThis.Date(result.last_edited_time),
+          axiosInstance,
         );
       } catch (error) {
         if (retries === MAX_RETRIES) {
@@ -157,6 +165,7 @@ class Page {
    * @param {string} databaseId
    * @param {NotionProperty[]} notionProperties
    * @param {PageOptions} options
+   * @param {AxiosInstance} axiosInstance
    * @param {string[]} [excludeProperties]
    * @return {*}  {Promise<Page[]>}
    * @memberof Page
@@ -165,6 +174,7 @@ class Page {
     databaseId: string,
     notionProperties: NotionProperty[],
     options: PageOptions,
+    axiosInstance: AxiosInstance,
     excludeProperties?: string[],
   ): Promise<Page[]> {
     if (!options.filter && !options.sorts) {
@@ -206,7 +216,7 @@ class Page {
         if (hasMore) {
           bodyParams.start_cursor = nextCursor;
         }
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           `/databases/${databaseId}/query`,
           bodyParams,
         );
@@ -241,6 +251,7 @@ class Page {
               result.archived,
               new globalThis.Date(result.created_time),
               new globalThis.Date(result.last_edited_time),
+              axiosInstance,
             );
             return page;
           }),
@@ -272,6 +283,7 @@ class Page {
    * @static
    * @param {string} databaseId
    * @param {NotionProperty[]} notionProperties
+   * @param {AxiosInstance} axiosInstance
    * @param {string[]} [excludeProperties]
    * @return {*}  {Promise<Page[]>}
    * @memberof Page
@@ -279,6 +291,7 @@ class Page {
   static async getAll(
     databaseId: string,
     notionProperties: NotionProperty[],
+    axiosInstance: AxiosInstance,
     excludeProperties?: string[],
   ): Promise<Page[]> {
     let hasMore: boolean = false;
@@ -291,7 +304,7 @@ class Page {
         if (hasMore) {
           bodyParams.start_cursor = nextCursor;
         }
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           `/databases/${databaseId}/query`,
           bodyParams,
         );
@@ -326,6 +339,7 @@ class Page {
               result.archived,
               new globalThis.Date(result.created_time),
               new globalThis.Date(result.last_edited_time),
+              axiosInstance,
             );
             return page;
           }),
@@ -358,6 +372,7 @@ class Page {
    * @param {string} databaseId
    * @param {NotionProperty[]} notionProperties
    * @param {Record<string, PropertyData>} data
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
@@ -365,6 +380,7 @@ class Page {
     databaseId: string,
     notionProperties: NotionProperty[],
     data: Record<string, PropertyData>,
+    axiosInstance: AxiosInstance,
   ): Promise<Page> {
     let retries = 0;
     const propertyNames = Object.keys(data);
@@ -379,7 +395,7 @@ class Page {
     let page: Page | null = null;
     do {
       try {
-        const response = await axios.post(`/pages`, {
+        const response = await axiosInstance.post(`/pages`, {
           parent: {
             type: 'database_id',
             database_id: databaseId,
@@ -409,6 +425,7 @@ class Page {
           result.archived,
           new globalThis.Date(result.created_time),
           new globalThis.Date(result.last_edited_time),
+          axiosInstance,
         );
       } catch (error) {
         if (!error.isAxiosError) {
@@ -434,11 +451,15 @@ class Page {
   /**
    * Updates the current Page.
    * @param {Record<string, PropertyData>} data
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
-  async update(data: Record<string, PropertyData>): Promise<Page> {
-    return update(this.#notionProperties, this.#id, data);
+  async update(
+    data: Record<string, PropertyData>,
+    axiosInstance: AxiosInstance,
+  ): Promise<Page> {
+    return update(this.#notionProperties, this.#id, data, axiosInstance);
   }
 
   /**
@@ -447,6 +468,7 @@ class Page {
    * @param {NotionProperty[]} notionProperties
    * @param {(NotionUrl | NotionId)} identifier
    * @param {Record<string, PropertyData>} data
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
@@ -454,21 +476,28 @@ class Page {
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
     data: Record<string, PropertyData>,
+    axiosInstance: AxiosInstance,
   ): Promise<Page> {
     const pageId = identifier.getId();
-    return update(notionProperties, pageId, data);
+    return update(notionProperties, pageId, data, axiosInstance);
   }
 
   /**
    * Deletes (archives) the current Page.
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
-  async delete(): Promise<Page> {
+  async delete(axiosInstance: AxiosInstance): Promise<Page> {
     if (this.#archived) {
       throw new Error(`Page ${this.#id} has already been deleted.`);
     }
-    return await setArchived(this.#notionProperties, this.#id, true);
+    return await setArchived(
+      this.#notionProperties,
+      this.#id,
+      true,
+      axiosInstance,
+    );
   }
 
   /**
@@ -476,27 +505,35 @@ class Page {
    * @static
    * @param {NotionProperty[]} notionProperties
    * @param {(NotionUrl | NotionId)} identifier
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
   static delete(
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
+    axiosInstance: AxiosInstance,
   ): Promise<Page> {
     const pageId = identifier.getId();
-    return setArchived(notionProperties, pageId, true);
+    return setArchived(notionProperties, pageId, true, axiosInstance);
   }
 
   /**
    * Restores (unarchives) the current Page.
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
-  async restore(): Promise<Page> {
+  async restore(axiosInstance: AxiosInstance): Promise<Page> {
     if (!this.#archived) {
       throw new Error(`Page ${this.#id} is already active.`);
     }
-    return await setArchived(this.#notionProperties, this.#id, false);
+    return await setArchived(
+      this.#notionProperties,
+      this.#id,
+      false,
+      axiosInstance,
+    );
   }
 
   /**
@@ -504,15 +541,17 @@ class Page {
    * @static
    * @param {NotionProperty[]} notionProperties
    * @param {(NotionUrl | NotionId)} identifier
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Page>}
    * @memberof Page
    */
   static async restore(
     notionProperties: NotionProperty[],
     identifier: NotionUrl | NotionId,
+    axiosInstance: AxiosInstance,
   ): Promise<Page> {
     const pageId = identifier.getId();
-    return setArchived(notionProperties, pageId, false);
+    return setArchived(notionProperties, pageId, false, axiosInstance);
   }
 }
 /**
@@ -520,12 +559,14 @@ class Page {
  * @param {NotionProperty[]} notionProperties
  * @param {string} pageId
  * @param {Record<string, PropertyData>} data
+ * @param {AxiosInstance} axiosInstance
  * @return {*}  {Promise<Page>}
  */
 async function update(
   notionProperties: NotionProperty[],
   pageId: string,
   data: Record<string, PropertyData>,
+  axiosInstance: AxiosInstance,
 ): Promise<Page> {
   let retries = 0;
   const propertyNames = Object.keys(data);
@@ -540,7 +581,7 @@ async function update(
   let page: Page | null = null;
   do {
     try {
-      const response = await axios.patch(`/pages/${pageId}`, {
+      const response = await axiosInstance.patch(`/pages/${pageId}`, {
         properties: transformToNotionProperties(notionProperties, data),
       });
       const result = response.data as PageResponse;
@@ -566,6 +607,7 @@ async function update(
         result.archived,
         new globalThis.Date(result.created_time),
         new globalThis.Date(result.last_edited_time),
+        axiosInstance,
       );
     } catch (error) {
       if (!error.isAxiosError) {
@@ -593,18 +635,20 @@ async function update(
  * @param {NotionProperty[]} notionProperties
  * @param {string} pageId
  * @param {boolean} archived
- * @return {*}
+ * @param {AxiosInstance} axiosInstance
+ * @return {*}  {Promise<Page>}
  */
 async function setArchived(
   notionProperties: NotionProperty[],
   pageId: string,
   archived: boolean,
-) {
+  axiosInstance: AxiosInstance,
+): Promise<Page> {
   let retries = 0;
   let page: Page | null = null;
   do {
     try {
-      const response = await axios.patch(`/pages/${pageId}`, {
+      const response = await axiosInstance.patch(`/pages/${pageId}`, {
         archived,
       });
       const result = response.data as PageResponse;
@@ -630,6 +674,7 @@ async function setArchived(
         result.archived,
         new globalThis.Date(result.created_time),
         new globalThis.Date(result.last_edited_time),
+        axiosInstance,
       );
     } catch (error) {
       if (retries === MAX_RETRIES) {

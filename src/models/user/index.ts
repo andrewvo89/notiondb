@@ -1,6 +1,7 @@
-import { axios, BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
-import { UserObject, UserResponse } from '.';
+import { AxiosInstance } from 'axios';
+import { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { NotionId } from '../notion';
+import { UserObject, UserResponse } from '.';
 
 /**
  * Class representing a Notion User.
@@ -46,16 +47,20 @@ class User {
    * Get a User using the User's ID.
    * @static
    * @param {string} userId
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<User>}
    * @memberof User
    */
-  static async get(identifier: NotionId): Promise<User> {
+  static async get(
+    identifier: NotionId,
+    axiosInstance: AxiosInstance,
+  ): Promise<User> {
     const userId = identifier.getId();
     let retries = 0;
     let user: User | null = null;
     do {
       try {
-        const response = await axios.get(`/users/${userId}`);
+        const response = await axiosInstance.get(`/users/${userId}`);
         const result = response.data as UserResponse;
         if (result.person) {
           user = new User(
@@ -88,10 +93,11 @@ class User {
   /**
    * Get all Users from the Database.
    * @static
+   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<User[]>}
    * @memberof User
    */
-  static async getAll(): Promise<User[]> {
+  static async getAll(axiosInstance: AxiosInstance): Promise<User[]> {
     let hasMore: boolean = false;
     let nextCursor: string = '';
     const users: User[] = [];
@@ -99,7 +105,7 @@ class User {
       const nextCursorParam: string = hasMore
         ? `?start_cursor=${nextCursor}`
         : '';
-      const response = await axios.get(`/users${nextCursorParam}`);
+      const response = await axiosInstance.get(`/users${nextCursorParam}`);
       const results = response.data.results as UserResponse[];
       users.push(
         ...results.map((result) =>
