@@ -1,4 +1,6 @@
+import { CreatedTime } from '../../models/property/created-time';
 import { isPropertyOptions, PropertyData } from '../../models';
+import { LastEditedTime } from '../../models/property/last-edited-time';
 import { PropertySort } from '../../models/sort';
 import { RelationFilter, SelectFilter } from '../../models/filter';
 import { Sort } from '../../models/sort';
@@ -334,6 +336,10 @@ function transformFromNotionProperties(propertyData: NotionPropertyData): any {
       return MultiSelect.getValue({ multi_select: data });
     case 'date':
       return Date.getValue({ date: data });
+    case 'created_time':
+      return CreatedTime.getValue({ created_time: data });
+    case 'last_edited_time':
+      return LastEditedTime.getValue({ last_edited_time: data });
     case 'checkbox':
       return Checkbox.getValue({ checkbox: data });
     case 'url':
