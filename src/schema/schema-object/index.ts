@@ -1,4 +1,4 @@
-import { SchemaObjectTypes } from './types';
+import { PropertyType } from '../../models';
 
 /**
  * Class representing a SchemaObject.
@@ -6,15 +6,15 @@ import { SchemaObjectTypes } from './types';
  */
 class SchemaObject {
   #property: string;
-  #type: SchemaObjectTypes;
+  #type: PropertyType;
 
   /**
    * Creates an instance of SchemaObject.
    * @param {string} property
-   * @param {SchemaObjectTypes} type
+   * @param {PropertyType} type
    * @memberof SchemaObject
    */
-  constructor(property: string, type: SchemaObjectTypes) {
+  constructor(property: string, type: PropertyType) {
     this.#property = property;
     this.#type = type;
   }
@@ -22,10 +22,10 @@ class SchemaObject {
   /**
    * Gets the type of the property of this Schema Object.
    * @readonly
-   * @type {SchemaObjectTypes}
+   * @type {PropertyType}
    * @memberof SchemaObject
    */
-  get type(): SchemaObjectTypes {
+  get type(): PropertyType {
     return this.#type;
   }
 
