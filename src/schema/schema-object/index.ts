@@ -34,7 +34,7 @@ class SchemaObject {
    * @return {*}  {Record<string, Record<string, any>>}
    * @memberof SchemaObject
    */
-  transformToNotionProperty(): Record<string, Record<string, {}>> {
+  transformToNotionProperty(): Record<string, Record<string, Record<string, any>>> {
     return {
       [this.#property]: {
         [this.#type]: {},

@@ -1,10 +1,3 @@
-import { CreatedTime } from '../../models/property/created-time';
-import { isPropertyOptions, PropertyData } from '../../models';
-import { LastEditedTime } from '../../models/property/last-edited-time';
-import { PropertySort } from '../../models/sort';
-import { RelationFilter, SelectFilter } from '../../models/filter';
-import { Sort } from '../../models/sort';
-import { validate as uuidValidate } from 'uuid';
 import {
   Checkbox,
   Date,
@@ -20,23 +13,27 @@ import {
   URL,
 } from '../../models/property';
 import {
-  Filter,
-  TextFilter,
   CheckboxFilter,
   CompoundFilter,
   DateFilter,
   FileFilter,
+  Filter,
   FormulaFilter,
   MultiSelectFilter,
   NumberFilter,
   PeopleFilter,
+  RelationFilter,
+  SelectFilter,
+  TextFilter,
 } from '../../models/filter';
+import { NotionProperty, NotionPropertyData, NotionUrlTypes } from '../../models/notion';
+import { PropertyData, isPropertyOptions } from '../../models';
+import { PropertySort, Sort } from '../../models/sort';
 
-import {
-  NotionProperty,
-  NotionPropertyData,
-  NotionUrlTypes,
-} from '../../models/notion';
+import { CreatedTime } from '../../models/property/created-time';
+import { LastEditedTime } from '../../models/property/last-edited-time';
+import { Relation } from '../../models/property/relation';
+import { validate as uuidValidate } from 'uuid';
 
 /**
  * Parses a Notion URL and returns the Notion ID.
@@ -51,9 +48,7 @@ import {
  */
 function getIdFromUrl(url: string, type: NotionUrlTypes): string {
   const id = (
-    type === NotionUrlTypes.DATABASE
-      ? url.split('/').pop()?.substring(0, 32)
-      : url.substring(url.length - 32)
+    type === NotionUrlTypes.DATABASE ? url.split('/').pop()?.substring(0, 32) : url.substring(url.length - 32)
   ) as string;
   const uuidv4 = transformStringToUUID(id);
   if (!uuidValidate(uuidv4)) {
@@ -84,10 +79,10 @@ function getIdFromId(id: string): string {
  * @return {*}  {string}
  */
 function transformStringToUUID(id: string): string {
-  const uuidv4 = `${id.substring(0, 8)}-${id.substring(8, 12)}-${id.substring(
-    12,
+  const uuidv4 = `${id.substring(0, 8)}-${id.substring(8, 12)}-${id.substring(12, 16)}-${id.substring(
     16,
-  )}-${id.substring(16, 20)}-${id.substring(20, 32)}`;
+    20,
+  )}-${id.substring(20, 32)}`;
   return uuidv4;
 }
 
@@ -121,10 +116,7 @@ function getFilterPropertyNames(filter: Filter): string[] {
   if (filter instanceof CompoundFilter) {
     propertyNames.push(
       ...filter.filters.reduce(
-        (prevPropertyNames: string[], currFilter) => [
-          ...prevPropertyNames,
-          ...getFilterPropertyNames(currFilter),
-        ],
+        (prevPropertyNames: string[], currFilter) => [...prevPropertyNames, ...getFilterPropertyNames(currFilter)],
         [],
       ),
     );
@@ -198,9 +190,7 @@ function validatePropertiesExist(
 } {
   const errors: string[] = [];
   for (const name of propertyNames) {
-    const propertyExists = properties.some(
-      (property) => property.name === name,
-    );
+    const propertyExists = properties.some((property) => property.name === name);
     if (!propertyExists) {
       errors.push(`${name} is not a property that exists.`);
     }
@@ -221,99 +211,99 @@ function transformToNotionProperties(
   properties: NotionProperty[],
   data: Record<string, PropertyData>,
 ): Record<string, any> {
-  return Object.entries(data).reduce(
-    (
-      notionProperties: Record<string, any>,
-      dataProperty: [string, PropertyData],
-    ) => {
-      const [propertyName, value] = dataProperty;
-      const property = properties.find((p) => p.name === propertyName);
-      if (!property) {
+  return Object.entries(data).reduce((notionProperties: Record<string, any>, dataProperty: [string, PropertyData]) => {
+    const [propertyName, value] = dataProperty;
+    const property = properties.find((p) => p.name === propertyName);
+    if (!property) {
+      return notionProperties;
+    }
+    let propertyData: PropertyInterface;
+    switch (property.type) {
+      case 'title':
+        if (typeof value !== 'string') {
+          throw new Error(`${propertyName} must be a string.`);
+        }
+        propertyData = new Title(value);
+        break;
+      case 'rich_text':
+        if (typeof value !== 'string') {
+          throw new Error(`${propertyName} must be a string.`);
+        }
+        propertyData = new RichText(value);
+        break;
+      case 'number':
+        if (typeof value !== 'number') {
+          throw new Error(`${propertyName} must be a string.`);
+        }
+        // tslint:disable-next-line: no-construct
+        propertyData = new Number(value);
+        break;
+      case 'select':
+        if (typeof value !== 'string') {
+          throw new Error(`${propertyName} must be a string.`);
+        }
+        propertyData = new Select(value);
+        break;
+      case 'multi_select':
+        if (!Array.isArray(value)) {
+          throw new Error(`${propertyName} must be an array of string.`);
+        }
+        if (value.some((v) => typeof v !== 'string')) {
+          throw new Error(`${propertyName} must be an array of string.`);
+        }
+        propertyData = new MultiSelect(value);
+        break;
+      case 'date':
+        if (isPropertyOptions(value) && value.value instanceof globalThis.Date) {
+          propertyData = new Date(value.value, value.options);
+        } else {
+          if (!(value instanceof globalThis.Date)) {
+            throw new Error(`${propertyName} must be date object.`);
+          }
+          propertyData = new Date(value);
+        }
+        break;
+      case 'checkbox':
+        if (typeof value !== 'boolean') {
+          throw new Error(`${propertyName} must be a boolean.`);
+        }
+        propertyData = new Checkbox(value);
+        break;
+      case 'url':
+        if (typeof value !== 'string') {
+          throw new Error(`${propertyName} must be a string.`);
+        }
+        propertyData = new URL(value);
+        break;
+      case 'email':
+        if (typeof value !== 'string') {
+          throw new Error(`${propertyName} must be a string.`);
+        }
+        propertyData = new Email(value);
+        break;
+      case 'phone_number':
+        if (typeof value !== 'string') {
+          throw new Error(`${propertyName} must be a string.`);
+        }
+        propertyData = new PhoneNumber(value);
+        break;
+      case 'relation':
+        if (!Array.isArray(value)) {
+          throw new Error(`${propertyName} must be an array of string.`);
+        }
+        if (value.some((v) => typeof v !== 'string')) {
+          throw new Error(`${propertyName} must be an array of string.`);
+        }
+        propertyData = new Relation(value);
+        break;
+      default:
         return notionProperties;
-      }
-      let propertyData: PropertyInterface;
-      switch (property.type) {
-        case 'title':
-          if (typeof value !== 'string') {
-            throw new Error(`${propertyName} must be a string.`);
-          }
-          propertyData = new Title(value);
-          break;
-        case 'rich_text':
-          if (typeof value !== 'string') {
-            throw new Error(`${propertyName} must be a string.`);
-          }
-          propertyData = new RichText(value);
-          break;
-        case 'number':
-          if (typeof value !== 'number') {
-            throw new Error(`${propertyName} must be a string.`);
-          }
-          // tslint:disable-next-line: no-construct
-          propertyData = new Number(value);
-          break;
-        case 'select':
-          if (typeof value !== 'string') {
-            throw new Error(`${propertyName} must be a string.`);
-          }
-          propertyData = new Select(value);
-          break;
-        case 'multi_select':
-          if (!Array.isArray(value)) {
-            throw new Error(`${propertyName} must be an array of string.`);
-          }
-          if (value.some((v) => typeof v !== 'string')) {
-            throw new Error(`${propertyName} must be an array of string.`);
-          }
-          propertyData = new MultiSelect(value);
-          break;
-        case 'date':
-          if (
-            isPropertyOptions(value) &&
-            value.value instanceof globalThis.Date
-          ) {
-            propertyData = new Date(value.value, value.options);
-          } else {
-            if (!(value instanceof globalThis.Date)) {
-              throw new Error(`${propertyName} must be date object.`);
-            }
-            propertyData = new Date(value);
-          }
-          break;
-        case 'checkbox':
-          if (typeof value !== 'boolean') {
-            throw new Error(`${propertyName} must be a boolean.`);
-          }
-          propertyData = new Checkbox(value);
-          break;
-        case 'url':
-          if (typeof value !== 'string') {
-            throw new Error(`${propertyName} must be a string.`);
-          }
-          propertyData = new URL(value);
-          break;
-        case 'email':
-          if (typeof value !== 'string') {
-            throw new Error(`${propertyName} must be a string.`);
-          }
-          propertyData = new Email(value);
-          break;
-        case 'phone_number':
-          if (typeof value !== 'string') {
-            throw new Error(`${propertyName} must be a string.`);
-          }
-          propertyData = new PhoneNumber(value);
-          break;
-        default:
-          return notionProperties;
-      }
-      return {
-        ...notionProperties,
-        [propertyName]: propertyData.notionValue,
-      };
-    },
-    {},
-  );
+    }
+    return {
+      ...notionProperties,
+      [propertyName]: propertyData.notionValue,
+    };
+  }, {});
 }
 
 /**
@@ -358,6 +348,8 @@ function transformFromNotionProperties(propertyData: NotionPropertyData): any {
         [type]: propertyData.formula[type],
       });
     }
+    case 'relation':
+      return Relation.getValue({ relation: data });
     default:
       return undefined;
   }

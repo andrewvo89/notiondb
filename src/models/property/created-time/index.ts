@@ -1,5 +1,5 @@
-import dayjs from 'dayjs';
 import { CreatedTimeNotionValue } from '.';
+import dayjs from 'dayjs';
 
 /**
  * Class representing a CreatedTime Notion type.

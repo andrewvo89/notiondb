@@ -7,8 +7,4 @@ interface TitleNotionValue {
   }[];
 }
 
-interface TitlePropertyObject {
-  title: {};
-}
-
-export { TitleNotionValue, TitlePropertyObject };
+export { TitleNotionValue };

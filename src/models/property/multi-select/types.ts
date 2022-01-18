@@ -4,8 +4,4 @@ interface MultiSelectNotionValue {
   }[];
 }
 
-interface MultiSelectPropertyObject {
-  multi_select: {};
-}
-
-export { MultiSelectNotionValue, MultiSelectPropertyObject };
+export { MultiSelectNotionValue };

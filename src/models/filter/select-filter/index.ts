@@ -1,4 +1,5 @@
 import { Filter, NotionPropertyFilter } from '..';
+
 import { SelectFilterTypes } from '.';
 
 /**
@@ -18,11 +19,7 @@ class SelectFilter implements Filter {
    * @param {(string | boolean)} value
    * @memberof SelectFilter
    */
-  constructor(
-    property: string,
-    type: SelectFilterTypes,
-    value: string | boolean,
-  ) {
+  constructor(property: string, type: SelectFilterTypes, value: string | boolean) {
     this.#property = property;
     this.#type = type;
     this.#value = value;

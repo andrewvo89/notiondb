@@ -8,12 +8,7 @@ interface PeopleNotionValue {
     person?: {
       email: string;
     };
-    bot?: {};
   }[];
-}
-
-interface PeoplePropertyObject {
-  people: {};
 }
 
 interface PeopleFriendlyValue {
@@ -23,4 +18,4 @@ interface PeopleFriendlyValue {
   email?: string;
 }
 
-export { PeopleNotionValue, PeoplePropertyObject, PeopleFriendlyValue };
+export { PeopleNotionValue, PeopleFriendlyValue };

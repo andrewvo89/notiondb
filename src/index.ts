@@ -1,13 +1,14 @@
-import axios, { AxiosInstance } from 'axios';
 import { Database, NotionId, NotionUrl } from './models';
+
 import { PropertySchema } from './schema';
+import axios from 'axios';
+import { setAxiosInstance } from './axios';
 
 /**
  * Class representing a NotionDB.
  * @class NotionDB
  */
 class NotionDB {
-  #axiosInstance: AxiosInstance;
   /**
    * Creates an instance of NotionDB with an integration key.
    * An Integration needs to be created at https://www.notion.so/my-integrations.
@@ -15,14 +16,14 @@ class NotionDB {
    * @memberof NotionDB
    */
   constructor(integrationToken: string) {
-    const axiosInstance = axios.create({
+    const instance = axios.create({
       baseURL: 'https://api.notion.com/v1',
       headers: {
         'Notion-Version': '2021-05-13',
         Authorization: integrationToken,
       },
     });
-    this.#axiosInstance = axiosInstance;
+    setAxiosInstance(instance);
   }
 
   /**
@@ -32,20 +33,10 @@ class NotionDB {
    */
   get databases() {
     return {
-      get: (identifier: NotionUrl | NotionId) =>
-        Database.get(identifier, this.#axiosInstance),
-      getAll: () => Database.getAll(this.#axiosInstance),
-      create: (
-        parentPageIdentifier: NotionUrl | NotionId,
-        title: string,
-        schema: PropertySchema,
-      ) =>
-        Database.create(
-          parentPageIdentifier,
-          title,
-          schema,
-          this.#axiosInstance,
-        ),
+      get: (identifier: NotionUrl | NotionId) => Database.get(identifier),
+      getAll: () => Database.getAll(),
+      create: (parentPageIdentifier: NotionUrl | NotionId, title: string, schema: PropertySchema) =>
+        Database.create(parentPageIdentifier, title, schema),
     };
   }
 }

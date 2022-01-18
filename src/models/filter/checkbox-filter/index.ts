@@ -1,5 +1,6 @@
-import { CheckboxFilterTypes } from '.';
 import { Filter, NotionPropertyFilter } from '..';
+
+import { CheckboxFilterTypes } from '.';
 
 /**
  * Class representing a CheckboxFilter.

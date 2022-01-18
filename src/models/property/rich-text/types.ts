@@ -7,8 +7,4 @@ interface RichTextNotionValue {
   }[];
 }
 
-interface RichTextPropertyObject {
-  rich_text: {};
-}
-
-export { RichTextNotionValue, RichTextPropertyObject };
+export { RichTextNotionValue };

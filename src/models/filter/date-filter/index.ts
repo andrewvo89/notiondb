@@ -1,5 +1,6 @@
-import { DateFilterTypes } from '.';
 import { Filter, NotionPropertyFilter } from '..';
+
+import { DateFilterTypes } from '.';
 
 /**
  * Class representing a DateFilter.
@@ -18,11 +19,7 @@ class DateFilter implements Filter {
    * @param {(string | boolean | object)} value
    * @memberof DateFilter
    */
-  constructor(
-    property: string,
-    type: DateFilterTypes,
-    value: string | boolean | object,
-  ) {
+  constructor(property: string, type: DateFilterTypes, value: string | boolean | object) {
     this.#property = property;
     this.#type = type;
     this.#value = value;

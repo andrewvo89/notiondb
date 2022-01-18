@@ -5,10 +5,6 @@ interface DateNotionValue {
   };
 }
 
-interface DatePropertyObject {
-  date: {};
-}
-
 interface DateFriendlyValue {
   start: globalThis.Date;
   end?: globalThis.Date;
@@ -370,10 +366,4 @@ type Timezones =
   | 'Pacific/Apia'
   | 'Africa/Johannesburg';
 
-export {
-  DateNotionValue,
-  DatePropertyObject,
-  DateFriendlyValue,
-  DateOptions,
-  Timezones,
-};
+export { DateNotionValue, DateFriendlyValue, DateOptions, Timezones };

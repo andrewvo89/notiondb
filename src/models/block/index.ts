@@ -1,7 +1,8 @@
-import { AxiosInstance } from 'axios';
 import { BACK_OFF_TIME, MAX_RETRIES } from '../../utils/api';
 import { BlockObject, BlockResponse, BlockTypes } from '.';
 import { NotionId, NotionUrl } from '../notion';
+
+import { getAxiosInstance } from '../../axios';
 
 /**
  * Class representing a Block.
@@ -14,7 +15,6 @@ class Block {
   #lastEditedTime: globalThis.Date;
   #hasChildren: boolean;
   #data: Record<string, any>;
-  #axiosInstance: AxiosInstance;
 
   /**
    * Creates an instance of Block.
@@ -24,7 +24,6 @@ class Block {
    * @param {globalThis.Date} lastEditedTime
    * @param {boolean} hasChildren
    * @param {Record<string, any>} data
-   * @param {AxiosInstance} axiosInstance
    * @memberof Block
    */
   constructor(
@@ -34,7 +33,6 @@ class Block {
     lastEditedTime: globalThis.Date,
     hasChildren: boolean,
     data: Record<string, any>,
-    axiosInstance: AxiosInstance,
   ) {
     this.#id = id;
     this.#type = type;
@@ -42,7 +40,6 @@ class Block {
     this.#lastEditedTime = lastEditedTime;
     this.#hasChildren = hasChildren;
     this.#data = data;
-    this.#axiosInstance = axiosInstance;
   }
 
   /**
@@ -66,27 +63,20 @@ class Block {
    * Gets all Blocks from a parent Block Notion ID or Notion URL.
    * @static
    * @param {(NotionId | NotionUrl)} identifier
-   * @param {AxiosInstance} axiosInstance
    * @return {*}  {Promise<Block[]>}
    * @memberof Block
    */
-  static async getAll(
-    identifier: NotionId | NotionUrl,
-    axiosInstance: AxiosInstance,
-  ): Promise<Block[]> {
+  static async getAll(identifier: NotionId | NotionUrl): Promise<Block[]> {
+    const axiosInstance = getAxiosInstance();
     const blockId = identifier.getId();
     const blocks: Block[] = [];
-    let hasMore: boolean = false;
-    let nextCursor: string = '';
-    const nextCursorParam: string = hasMore
-      ? `?start_cursor=${nextCursor}`
-      : '';
+    let hasMore = false;
+    let nextCursor = '';
+    const nextCursorParam: string = hasMore ? `?start_cursor=${nextCursor}` : '';
     do {
       let retries = 0;
       try {
-        const response = await axiosInstance.get(
-          `/blocks/${blockId}/children${nextCursorParam}`,
-        );
+        const response = await axiosInstance.get(`/blocks/${blockId}/children${nextCursorParam}`);
         const results = response.data.results as BlockResponse[];
         blocks.push(
           ...results.map(
@@ -98,7 +88,6 @@ class Block {
                 new globalThis.Date(result.last_edited_time),
                 result.has_children,
                 result[result.type],
-                axiosInstance,
               ),
           ),
         );
@@ -107,7 +96,9 @@ class Block {
           nextCursor = response.data.next_cursor;
         }
       } catch (error) {
+        // @ts-ignore
         if (!error.isAxiosError) {
+          // @ts-ignore
           throw new Error(error);
         }
         if (retries === MAX_RETRIES) {

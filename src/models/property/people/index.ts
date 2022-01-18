@@ -1,4 +1,5 @@
 import { PeopleFriendlyValue, PeopleNotionValue } from '.';
+
 import { PropertyInterface } from '..';
 
 /**

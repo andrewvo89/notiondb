@@ -1,8 +1,9 @@
+import { DateFriendlyValue, DateNotionValue, DateOptions } from '.';
+
+import { PropertyInterface } from '..';
 import dayjs from 'dayjs';
 import dayjsTimezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { DateFriendlyValue, DateNotionValue, DateOptions } from '.';
-import { PropertyInterface } from '..';
 dayjs.extend(utc);
 dayjs.extend(dayjsTimezone);
 
@@ -45,9 +46,7 @@ class Date implements PropertyInterface {
         dateProperties.end = dayjs(end).format('YYYY-MM-DD');
       }
       if (timezone) {
-        dateProperties.start = dayjs
-          .tz(this.#start, timezone)
-          .format('YYYY-MM-DD');
+        dateProperties.start = dayjs.tz(this.#start, timezone).format('YYYY-MM-DD');
         if (end) {
           dateProperties.end = dayjs.tz(end, timezone).format('YYYY-MM-DD');
         }

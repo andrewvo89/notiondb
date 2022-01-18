@@ -1,11 +1,5 @@
-import {
-  CheckboxFilter,
-  DateFilter,
-  NumberFilter,
-  TextFilter,
-  Filter,
-  NotionPropertyFilter,
-} from '..';
+import { CheckboxFilter, DateFilter, Filter, NotionPropertyFilter, NumberFilter, TextFilter } from '..';
+
 import { FormulaFilterTypes } from '.';
 
 /**

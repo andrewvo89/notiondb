@@ -7,7 +7,6 @@ interface UserResponse {
   person?: {
     email: string;
   };
-  bot?: {};
 }
 
 interface UserObject {

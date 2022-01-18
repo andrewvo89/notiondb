@@ -1,5 +1,5 @@
-import dayjs from 'dayjs';
 import { LastEditedTimeNotionValue } from '.';
+import dayjs from 'dayjs';
 
 /**
  * Class representing a LastEditedTime Notion type.

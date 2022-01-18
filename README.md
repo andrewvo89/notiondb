@@ -21,7 +21,7 @@
 
 ## 🧐 About
 
-NotionDB is an object modelling tool designed to interface with [Notion](https://www.notion.so/). It is a tool to allow developers to easily spin up a cloud based database using [Notion Databases](https://www.notion.so/Intro-to-databases-fd8cd2d212f74c50954c11086d85997e) Notion Databases consist of a series of Notion Pages (database rows) with various Properties (database columns).
+NotionDB is an object modelling tool designed to interface with [Notion](https://www.notion.so/). It is a tool to allow developers to easily spin up a cloud based database using [Notion Databases](https://www.notion.so/Intro-to-databases-fd8cd2d212f74c50954c11086d85997e). Notion Databases consist of a series of Notion Pages (database rows) with various Properties (database columns).
 
 NotionDB leverages off the official [Notion API](https://developers.notion.com/) and provides developers with easy to use classes and helper functions to easily retrieve, write, update and delete data.
 

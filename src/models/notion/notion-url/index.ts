@@ -1,5 +1,5 @@
-import { getIdFromUrl } from '../../../utils/notion';
 import { NotionUrlTypes } from '.';
+import { getIdFromUrl } from '../../../utils/notion';
 
 /**
  * Class representing a Notion URL.

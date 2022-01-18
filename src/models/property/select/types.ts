@@ -4,8 +4,4 @@ interface SelectNotionValue {
   };
 }
 
-interface SelectPropertyObject {
-  select: {};
-}
-
-export { SelectNotionValue, SelectPropertyObject };
+export { SelectNotionValue };

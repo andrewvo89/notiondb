@@ -13,9 +13,7 @@ class PropertySchema {
    * @memberof PropertySchema
    */
   constructor(schemaObjects: SchemaObject[]) {
-    const hasTitleProperty = schemaObjects.some(
-      (schemaObject) => schemaObject.type === 'title',
-    );
+    const hasTitleProperty = schemaObjects.some((schemaObject) => schemaObject.type === 'title');
     if (!hasTitleProperty) {
       schemaObjects.push(new SchemaObject('Name', 'title'));
     }

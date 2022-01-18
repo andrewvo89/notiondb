@@ -2,7 +2,7 @@
   "name": "notiondb",
   "license": "MIT",
   "author": "Andrew Vo-Nguyen <hello@andrewvo.co> (https://andrewvo.co)",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "NotionDB is an object modelling tool designed to interface with Notion Databases. It is a tool to allow developers to easily spin up a cloud based database using Notion Databases, consisting of a series of Notion Pages (database rows) with various Properties (database columns).",
   "keywords": [
     "notion",
@@ -17,6 +17,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "commit": "cz",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "yarn run build",
@@ -31,10 +32,12 @@
   "devDependencies": {
     "@types/node": "^16.4.1",
     "@types/uuid": "^8.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
     "cz-conventional-changelog": "3.3.0",
+    "eslint": "^8.7.0",
+    "eslint-config-prettier": "^8.3.0",
     "prettier": "^2.3.2",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.3.5"
   },
   "files": [
