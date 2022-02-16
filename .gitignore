@@ -45,3 +45,4 @@ lib
 test/*.js
 *.map
 ignore
+.publish-instructions.md

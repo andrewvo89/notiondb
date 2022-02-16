@@ -16,13 +16,11 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "tsc",
     "commit": "cz",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json",
-    "prepare": "yarn run build",
-    "prepublishOnly": "yarn run lint",
-    "preversion": "yarn run lint"
+    "lint": "eslint && tsc -p tsconfig.json",
+    "build": "rm -r lib && tsc -p tsconfig.json",
+    "prepare": "yarn run lint && yarn run build"
   },
   "dependencies": {
     "axios": "^0.21.1",
